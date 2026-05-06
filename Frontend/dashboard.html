@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Muscle Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; overflow-x: hidden; color: white; min-height: 100vh; opacity: 0; transition: opacity 0.6s ease; }
+        body.loaded { opacity: 1; }
+        
+        .gym-bg { position: fixed; inset: 0; z-index: 0; background: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80') center/cover no-repeat; background-attachment: fixed; }
+        .gym-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.92) 0%, rgba(30,0,0,0.85) 50%, rgba(0,0,0,0.92) 100%); }
+        
+        canvas#bgCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .content { position: relative; z-index: 2; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .content.visible { opacity: 1; transform: translateY(0); }
+        
+        .navbar { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 1300px; background: rgba(0,0,0,0.95); backdrop-filter: blur(25px); border-radius: 60px; padding: 14px 35px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border: 1px solid rgba(255,0,0,0.4); }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; font-family: 'Orbitron', sans-serif; text-decoration: none; color: white; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #ff0000, #cc0000); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 15px rgba(255,0,0,0.4); }
+        .logo-text { background: linear-gradient(135deg, #fff, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; transition: all 0.3s; }
+        .nav-links a:hover { color: #ff0000; }
+        
+        .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 130px 20px 80px; }
+        
+        .welcome-section { background: linear-gradient(135deg, rgba(255,0,0,0.15), rgba(0,0,0,0.5)); border-radius: 30px; padding: 40px; margin-bottom: 40px; border: 1px solid rgba(255,0,0,0.3); text-align: center; }
+        .welcome-section h1 { font-family: 'Orbitron', sans-serif; font-size: 36px; margin-bottom: 10px; }
+        .gradient-text { background: linear-gradient(135deg, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .user-stats { display: flex; justify-content: center; gap: 30px; margin-top: 25px; flex-wrap: wrap; }
+        .stat-box { background: rgba(0,0,0,0.5); padding: 15px 25px; border-radius: 20px; border: 1px solid rgba(255,0,0,0.2); }
+        .stat-box .number { font-size: 28px; font-weight: 800; color: #ff0000; font-family: 'Orbitron', sans-serif; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; }
+        .card { background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255,0,0,0.2); padding: 30px; }
+        .card h2 { font-family: 'Orbitron', sans-serif; font-size: 22px; margin-bottom: 20px; color: #ff0000; }
+        .card h2 .icon { margin-right: 10px; }
+        
+        .stars { display: flex; gap: 8px; margin: 15px 0; }
+        .star { font-size: 30px; cursor: pointer; color: #555; transition: all 0.2s; }
+        .star.active { color: #ffd700; }
+        .star:hover { transform: scale(1.1); }
+        
+        .rating-text { margin-top: 10px; font-size: 14px; color: #ffd700; }
+        
+        textarea { width: 100%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,0,0,0.3); border-radius: 12px; color: white; font-size: 14px; margin: 15px 0; resize: vertical; font-family: 'Inter', sans-serif; }
+        textarea:focus { outline: none; border-color: #ff0000; }
+        
+        .btn-submit { padding: 12px 30px; background: linear-gradient(135deg, #ff0000, #cc0000); border: none; border-radius: 50px; color: white; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,0,0,0.4); }
+        
+        .feedback-item { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; margin-bottom: 15px; border-left: 3px solid #ff0000; }
+        .feedback-header { display: flex; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .feedback-name { font-weight: 700; color: #ff0000; }
+        .feedback-rating { color: #ffd700; }
+        .feedback-date { font-size: 11px; opacity: 0.5; }
+        .feedback-text { font-size: 14px; line-height: 1.6; opacity: 0.8; margin-top: 10px; }
+        
+        .btn-plan { width: 100%; padding: 15px; background: linear-gradient(135deg, #ff0000, #cc0000); border: none; border-radius: 50px; color: white; font-weight: 700; cursor: pointer; margin-top: 20px; transition: all 0.3s; }
+        .btn-plan:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,0,0,0.4); }
+        .btn-plan-outline { background: transparent; border: 1px solid #ff0000; }
+        
+        .alert { padding: 12px; border-radius: 10px; margin-bottom: 20px; display: none; position: fixed; top: 100px; left: 50%; transform: translateX(-50%); z-index: 1000; min-width: 300px; text-align: center; }
+        .alert-success { background: rgba(0,255,0,0.2); border: 1px solid #00ff00; color: #00ff88; }
+        .alert-error { background: rgba(255,0,0,0.2); border: 1px solid #ff0000; color: #ff6666; }
+        
+        .footer { background: #000000; padding: 30px 20px; text-align: center; border-top: 1px solid rgba(255,0,0,0.2); margin-top: 40px; }
+        
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } .welcome-section h1 { font-size: 28px; } }
+        ::selection { background: rgba(255,0,0,0.4); color: white; }
+    </style>
+</head>
+<body>
+    <div class="gym-bg"></div>
+    <canvas id="bgCanvas"></canvas>
+    
+    <div class="content" id="mainContent">
+        <nav class="navbar">
+            <a href="index.html" class="logo"><div class="logo-icon">⚡</div><span class="logo-text">MUSCLE FORGE</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="gender.html">New Plan</a>
+            </div>
+        </nav>
+        
+        <div class="dashboard-container">
+            <div class="welcome-section">
+                <h1>Welcome, <span class="gradient-text" id="userName">User</span>! 👋</h1>
+                <p>Please share your feedback about your experience with Muscle Forge</p>
+                <div class="user-stats">
+                    <div class="stat-box"><div class="number" id="planCount">0</div><div>Plans Generated</div></div>
+                    <div class="stat-box"><div class="number" id="feedbackCount">0</div><div>Feedbacks Given</div></div>
+                    <div class="stat-box"><div class="number" id="avgRating">0</div><div>⭐ Avg Rating</div></div>
+                </div>
+            </div>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h2><span class="icon">⭐</span> Rate Your Experience</h2>
+                    <div class="stars" id="starRating">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                    <div class="rating-text" id="ratingText">Click a star to rate</div>
+                    <textarea id="feedbackText" rows="3" placeholder="Share your experience with Muscle Forge..."></textarea>
+                    <button class="btn-submit" id="submitFeedbackBtn">Submit Feedback →</button>
+                </div>
+                
+                <div class="card">
+                    <h2><span class="icon">📋</span> Quick Actions</h2>
+                    <button class="btn-plan" onclick="window.location.href='gender.html'">📝 Generate New Plan</button>
+                    <button class="btn-plan btn-plan-outline" style="margin-top: 15px;" onclick="window.location.href='plan.html'">📄 View Your Current Plan</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><span class="icon">💬</span> User Feedback & Ratings</h2>
+                <div id="feedbackList"></div>
+            </div>
+        </div>
+        
+        <footer class="footer"><p>© 2024 Muscle Forge — Forging Champions Worldwide 🌍</p></footer>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="module">
+        import { auth, db, signOut, onAuthStateChanged, doc, getDoc, collection, addDoc, query, orderBy, getDocs } from './firebase-config.js';
+        
+        let currentUser = null;
+        let selectedRating = 0;
+        let userId = null;
+        
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alert') || (() => {
+                const div = document.createElement('div');
+                div.id = 'alert';
+                div.style.position = 'fixed';
+                div.style.top = '100px';
+                div.style.left = '50%';
+                div.style.transform = 'translateX(-50%)';
+                div.style.zIndex = '1000';
+                div.style.minWidth = '300px';
+                div.style.textAlign = 'center';
+                document.body.appendChild(div);
+                return div;
+            })();
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.display = 'block';
+            setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
+        }
+        
+        async function initDashboard() {
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                currentUser = user;
+                userId = user.uid;
+                
+                const userDoc = await getDoc(doc(db, "users", userId));
+                const userData = userDoc.exists() ? userDoc.data() : { name: user.displayName || user.email.split('@')[0] };
+                
+                document.getElementById('userName').textContent = userData.name || user.email.split('@')[0];
+                
+                await loadUserStats();
+                await loadFeedbacks();
+                initStarRating();
+            });
+        }
+        
+        async function loadUserStats() {
+            const plans = JSON.parse(localStorage.getItem('userPlans') || '[]');
+            const userPlans = plans.filter(p => p.userId === userId);
+            document.getElementById('planCount').textContent = userPlans.length;
+            
+            const feedbacks = JSON.parse(localStorage.getItem('feedbacks') || '[]');
+            const userFeedbacks = feedbacks.filter(f => f.userId === userId);
+            document.getElementById('feedbackCount').textContent = userFeedbacks.length;
+        }
+        
+        function initStarRating() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.removeEventListener('click', starClickHandler);
+                star.addEventListener('click', starClickHandler);
+            });
+        }
+        
+        function starClickHandler() {
+            selectedRating = parseInt(this.dataset.value);
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(s => s.classList.remove('active'));
+            for (let i = 0; i < selectedRating; i++) { 
+                stars[i].classList.add('active'); 
+            }
+            const ratingTexts = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            document.getElementById('ratingText').textContent = `You rated: ${ratingTexts[selectedRating - 1]} (${selectedRating}/5)`;
+        }
+        
+        async function submitFeedback() {
+            if (!currentUser) { 
+                showAlert('Please login first', 'error');
+                return; 
+            }
+            if (selectedRating === 0) { 
+                showAlert('Please select a rating', 'error');
+                return; 
+            }
+            
+            const feedbackText = document.getElementById('feedbackText').value.trim();
+            if (!feedbackText) { 
+                showAlert('Please enter your feedback', 'error');
+                return; 
+            }
+            
+            const feedbacks = JSON.parse(localStorage.getItem('feedbacks') || '[]');
+            const newFeedback = {
+                id: Date.now(),
+                userId: userId,
+                userName: currentUser.displayName || currentUser.email.split('@')[0],
+                userEmail: currentUser.email,
+                rating: selectedRating,
+                feedback: feedbackText,
+                date: new Date().toISOString()
+            };
+            feedbacks.unshift(newFeedback);
+            localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+            
+            try {
+                await addDoc(collection(db, "feedbacks"), newFeedback);
+            } catch(e) { console.error("Firestore save error:", e); }
+            
+            selectedRating = 0;
+            document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+            document.getElementById('feedbackText').value = '';
+            document.getElementById('ratingText').textContent = 'Click a star to rate';
+            showAlert('Thank you for your feedback!', 'success');
+            loadFeedbacks();
+            loadUserStats();
+        }
+        
+        async function loadFeedbacks() {
+            const feedbacks = JSON.parse(localStorage.getItem('feedbacks') || '[]');
+            const feedbackList = document.getElementById('feedbackList');
+            
+            if (feedbacks.length === 0) {
+                feedbackList.innerHTML = '<p style="text-align:center; opacity:0.6;">No feedback yet. Be the first to share your experience!</p>';
+                return;
+            }
+            
+            let totalRating = 0;
+            feedbacks.forEach(f => totalRating += f.rating);
+            const avgRating = (totalRating / feedbacks.length).toFixed(1);
+            document.getElementById('avgRating').textContent = avgRating;
+            
+            feedbackList.innerHTML = feedbacks.slice(0, 20).map(f => `
+                <div class="feedback-item">
+                    <div class="feedback-header">
+                        <span class="feedback-name">${escapeHtml(f.userName)}</span>
+                        <span class="feedback-rating">${'★'.repeat(f.rating)}${'☆'.repeat(5-f.rating)}</span>
+                        <span class="feedback-date">${new Date(f.date).toLocaleDateString()}</span>
+                    </div>
+                    <div class="feedback-text">${escapeHtml(f.feedback)}</div>
+                </div>
+            `).join('');
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function initThreeJS() {
+            const canvas = document.getElementById('bgCanvas'); if(!canvas) return;
+            const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.z = 20; const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight); renderer.setClearColor(0x000000, 0);
+            scene.add(new THREE.AmbientLight(0x0a0a0a, 0.4));
+            const pL1 = new THREE.PointLight(0xff0000, 1, 50); pL1.position.set(-8, 5, 5); scene.add(pL1);
+            const tkGeo = new THREE.TorusKnotGeometry(2.5, 0.35, 256, 32, 3, 5);
+            const tkMat = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0x330000 });
+            const torusKnot = new THREE.Mesh(tkGeo, tkMat); scene.add(torusKnot);
+            const pCount = 2000; const pGeo = new THREE.BufferGeometry(); const pPos = new Float32Array(pCount * 3);
+            for(let i=0; i<pCount; i++) { pPos[i*3]=(Math.random()-0.5)*200; pPos[i*3+1]=(Math.random()-0.5)*100; pPos[i*3+2]=(Math.random()-0.5)*100-30; }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+            const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0xff0000, size: 0.05, transparent: true, opacity: 0.3 }));
+            scene.add(particles);
+            let time = 0;
+            function animate() { requestAnimationFrame(animate); time += 0.01; torusKnot.rotation.x = time * 0.3; torusKnot.rotation.y = time * 0.2; particles.rotation.y = time * 0.02; renderer.render(scene, camera); }
+            animate();
+            window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('loaded');
+            setTimeout(() => { document.getElementById('mainContent').classList.add('visible'); }, 100);
+            initDashboard();
+            initThreeJS();
+            document.getElementById('submitFeedbackBtn').addEventListener('click', submitFeedback);
+        });
+    </script>
+</body>
+</html>

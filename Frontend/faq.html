@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Muscle Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; }
+        .navbar { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 1300px; background: rgba(0,0,0,0.95); backdrop-filter: blur(25px); border-radius: 60px; padding: 14px 35px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border: 1px solid rgba(255,0,0,0.3); }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; font-family: 'Orbitron', sans-serif; text-decoration: none; color: white; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #ff0000, #cc0000); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .logo-text { background: linear-gradient(135deg, #fff, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { padding: 10px 24px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,0,0,0.3); border-radius: 50px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.4s; }
+        .container { max-width: 900px; margin: 0 auto; padding: 130px 20px 60px; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 42px; margin-bottom: 30px; }
+        .gradient-text { background: linear-gradient(135deg, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .faq-item { background: rgba(0,0,0,0.5); border-radius: 16px; margin-bottom: 15px; border: 1px solid rgba(255,0,0,0.1); overflow: hidden; }
+        .faq-question { padding: 20px 25px; cursor: pointer; font-weight: 700; font-size: 18px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .faq-question:hover { background: rgba(255,0,0,0.05); }
+        .faq-question .icon { transition: transform 0.3s; }
+        .faq-answer { padding: 0 25px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
+        .faq-item.active .faq-answer { padding: 0 25px 20px 25px; max-height: 300px; }
+        .faq-item.active .faq-question .icon { transform: rotate(45deg); }
+        .faq-answer p { line-height: 1.7; color: rgba(255,255,255,0.7); }
+        .footer { background: #000000; padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255,0,0,0.2); margin-top: 40px; }
+        @media (max-width: 768px) { h1 { font-size: 28px; } .container { padding: 100px 15px 40px; } .faq-question { font-size: 15px; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo"><div class="logo-icon">⚡</div><span class="logo-text">MUSCLE FORGE</span></a>
+        <a href="index.html" class="back-btn">← Back to Home</a>
+    </nav>
+    <div class="container">
+        <h1>Frequently Asked <span class="gradient-text">Questions</span></h1>
+        <div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-question">How does the plan generation work? <span class="icon">+</span></div><div class="faq-answer"><p>Our AI-powered system analyzes your body metrics (age, weight, height), fitness goals, dietary preference, and weekly budget to create personalized workout and diet plans tailored specifically for you.</p></div></div>
+        <div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-question">Is Muscle Forge free to use? <span class="icon">+</span></div><div class="faq-answer"><p>Basic plan generation is completely free! You can generate personalized workout and diet plans at no cost. Premium features are available for advanced tracking and analysis.</p></div></div>
+        <div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-question">How accurate are the calorie and protein calculations? <span class="icon">+</span></div><div class="faq-answer"><p>Our calculators use scientifically validated formulas (Mifflin-St Jeor for BMR) and adjust based on your activity level and goals. Results are highly accurate for most individuals.</p></div></div>
+        <div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-question">Can I get a plan for a specific budget? <span class="icon">+</span></div><div class="faq-answer"><p>Yes! We specialize in budget-smart plans. You enter your weekly food budget, and our system creates diet plans that fit within your budget while meeting your nutritional needs.</p></div></div>
+        <div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-question">What's the 30-Day Transformation Challenge? <span class="icon">+</span></div><div class="faq-answer"><p>Our gamified challenge lets you earn points for completing daily workouts and tasks. Redeem points for rewards like premium meal plans, training sessions, and merchandise. Complete all 30 days to unlock free rewards!</p></div></div>
+        <div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-question">Do you offer support if I have questions? <span class="icon">+</span></div><div class="faq-answer"><p>Absolutely! Contact us at <a href="mailto:udayganesh833@gmail.com" style="color:#ff0000">udayganesh833@gmail.com</a> or call <a href="tel:+918333852136" style="color:#ff0000">+91 8333852136</a>. We're available Monday-Saturday, 10 AM - 7 PM IST.</p></div></div>
+        <div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-question">Are the workouts suitable for beginners? <span class="icon">+</span></div><div class="faq-answer"><p>Yes! Our plans adjust based on your experience level (beginner, intermediate, advanced). Beginners get simpler exercises with lower volume and bodyweight options.</p></div></div>
+        <div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-question">Can I use Muscle Forge for weight loss? <span class="icon">+</span></div><div class="faq-answer"><p>Definitely! Select "Fat Loss" as your goal, and we'll create a calorie deficit plan with adequate protein to preserve muscle while losing fat.</p></div></div>
+        <div class="faq-item" onclick="this.classList.toggle('active')"><div class="faq-question">Is my data secure? <span class="icon">+</span></div><div class="faq-answer"><p>Yes! We use industry-standard encryption (SSL/TLS) for all data transmission. Your personal information is never shared with third parties without your consent.</p></div></div>
+    </div>
+    <footer class="footer"><p>© 2024 Muscle Forge — Forging Champions Worldwide 🌍</p></footer>
+    <script>document.querySelectorAll('.faq-item').forEach(item => { item.addEventListener('click', function(e) { e.stopPropagation(); }); });</script>
+</body>
+</html>

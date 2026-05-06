@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muscle Forge - Choose Your Path</title>
+    <meta name="description" content="Select your gender to get a personalized transformation plan">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; overflow-x: hidden; color: white; min-height: 100vh; cursor: default; opacity: 0; transition: opacity 0.6s ease; }
+        body.loaded { opacity: 1; }
+        
+        .gym-bg { position: fixed; inset: 0; z-index: 0; background: url('https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1920&q=80') center/cover no-repeat; background-attachment: fixed; }
+        .gym-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,0,0,0.8) 50%, rgba(0,0,0,0.9) 100%); }
+        
+        canvas#bgCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .content { position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .content.visible { opacity: 1; transform: translateY(0); }
+        
+        .navbar { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 1300px; background: rgba(0,0,0,0.95); backdrop-filter: blur(25px) saturate(200%); border-radius: 60px; padding: 14px 35px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border: 1px solid rgba(255,0,0,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-decoration: none; color: white; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #ff0000, #cc0000); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 15px rgba(255,0,0,0.4); animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 4px 15px rgba(255,0,0,0.4); } 50% { box-shadow: 0 4px 25px rgba(255,0,0,0.8); } }
+        .logo-text { background: linear-gradient(135deg, #fff, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { display: flex; align-items: center; gap: 8px; padding: 10px 24px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,0,0,0.4); border-radius: 50px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.4s; }
+        .back-btn:hover { background: rgba(255,0,0,0.15); border-color: #ff0000; transform: translateX(-3px); }
+        
+        .main-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 20px 60px; }
+        
+        .page-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: rgba(255,0,0,0.15); border: 1px solid rgba(255,0,0,0.4); border-radius: 50px; font-size: 12px; font-weight: 700; color: #ff0000; margin-bottom: 25px; letter-spacing: 2px; text-transform: uppercase; }
+        
+        .page-header h1 { font-family: 'Orbitron', sans-serif; font-size: 54px; font-weight: 900; line-height: 1.1; margin-bottom: 15px; text-align: center; text-shadow: 0 0 30px rgba(0,0,0,0.3); }
+        .gradient-text { background: linear-gradient(135deg, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 200% 200%; animation: gradientFlow 3s ease infinite; }
+        @keyframes gradientFlow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .page-header p { font-size: 17px; opacity: 0.7; font-family: 'Rajdhani', sans-serif; letter-spacing: 1.5px; text-align: center; }
+        
+        .gender-selection { display: flex; gap: 40px; margin-top: 50px; perspective: 1200px; }
+        
+        .gender-card { width: 420px; height: 560px; position: relative; border-radius: 28px; overflow: hidden; cursor: pointer; transition: all 0.6s cubic-bezier(0.4,0,0.2,1); transform-style: preserve-3d; border: 1.5px solid rgba(255,0,0,0.2); }
+        .gender-card:hover { transform: translateY(-18px) scale(1.02); border-color: rgba(255,0,0,0.6); box-shadow: 0 30px 70px rgba(255,0,0,0.3); }
+        
+        .card-bg { position: absolute; inset: 0; background-size: cover; background-position: center top; transition: all 0.8s; filter: brightness(0.5); }
+        .gender-card:hover .card-bg { transform: scale(1.1); filter: brightness(0.6); }
+        .gender-card.male .card-bg { background-image: url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&q=85'); }
+        .gender-card.female .card-bg { background-image: url('https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=85'); }
+        
+        .card-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.85) 80%, rgba(0,0,0,0.95) 100%); z-index: 1; }
+        
+        .card-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 40px; z-index: 2; }
+        .card-tag { display: inline-block; padding: 5px 14px; background: rgba(255,0,0,0.2); border: 1px solid rgba(255,0,0,0.5); border-radius: 30px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #ff0000; margin-bottom: 12px; }
+        .card-content h2 { font-family: 'Orbitron', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 10px; }
+        .card-content p { font-size: 14px; opacity: 0.7; line-height: 1.6; margin-bottom: 20px; }
+        
+        .card-features { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+        .card-feature { padding: 5px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; font-size: 12px; font-weight: 500; }
+        
+        .select-btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 35px; background: linear-gradient(135deg, rgba(255,0,0,0.3), rgba(204,0,0,0.3)); border: 1.5px solid rgba(255,0,0,0.5); border-radius: 50px; color: white; font-weight: 700; font-size: 14px; transition: all 0.5s; backdrop-filter: blur(10px); }
+        .gender-card:hover .select-btn { background: linear-gradient(135deg, #ff0000, #cc0000); border-color: transparent; box-shadow: 0 8px 30px rgba(255,0,0,0.5); }
+        .select-btn .arrow { transition: transform 0.4s; display: inline-block; }
+        .gender-card:hover .select-btn .arrow { transform: translateX(6px); }
+        
+        .bottom-info { text-align: center; margin-top: 45px; }
+        .secure-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); border-radius: 30px; color: #ff0000; font-size: 12px; font-weight: 600; }
+        .bottom-info > p { opacity: 0.5; font-size: 13px; margin-top: 10px; }
+        
+        @media (max-width: 900px) {
+            .gender-selection { flex-direction: column; align-items: center; gap: 25px; }
+            .gender-card { width: 100%; max-width: 420px; height: 450px; }
+            .page-header h1 { font-size: 34px; }
+        }
+        
+        ::selection { background: rgba(255,0,0,0.4); color: white; }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body>
+    <div class="gym-bg"></div>
+    <canvas id="bgCanvas"></canvas>
+    
+    <div class="content" id="mainContent">
+        <nav class="navbar">
+            <a href="index.html" class="logo"><div class="logo-icon">⚡</div><span class="logo-text">MUSCLE FORGE</span></a>
+            <a href="index.html" class="back-btn">← Back to Home</a>
+        </nav>
+        
+        <div class="main-container">
+            <div class="page-header">
+                <div class="page-badge">STEP 1 OF 3</div>
+                <h1>Choose Your <span class="gradient-text">Path</span></h1>
+                <p>Select your gender to get a personalized transformation plan</p>
+            </div>
+            
+            <div class="gender-selection">
+                <div class="gender-card male" onclick="selectGender('male')">
+                    <div class="card-bg"></div>
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                        <span class="card-tag">For Him</span>
+                        <h2>Male Program</h2>
+                        <p>Build raw strength, pack on lean muscle, and sculpt a powerful physique.</p>
+                        <div class="card-features">
+                            <span class="card-feature">💪 Muscle Building</span>
+                            <span class="card-feature">🔥 Fat Shred</span>
+                            <span class="card-feature">⚡ Strength</span>
+                            <span class="card-feature">🥩 Meal Plans</span>
+                        </div>
+                        <div class="select-btn">Select Male Program <span class="arrow">→</span></div>
+                    </div>
+                </div>
+                
+                <div class="gender-card female" onclick="selectGender('female')">
+                    <div class="card-bg"></div>
+                    <div class="card-overlay"></div>
+                    <div class="card-content">
+                        <span class="card-tag">For Her</span>
+                        <h2>Female Program</h2>
+                        <p>Tone your body, build graceful curves, and unleash your inner strength.</p>
+                        <div class="card-features">
+                            <span class="card-feature">🍑 Toning</span>
+                            <span class="card-feature">✨ Sculpting</span>
+                            <span class="card-feature">🧘 Flexibility</span>
+                            <span class="card-feature">🥗 Nutrition</span>
+                        </div>
+                        <div class="select-btn">Select Female Program <span class="arrow">→</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-info">
+                <span class="secure-badge">🔒 100% Secure & Private</span>
+                <p>Your data is encrypted and never shared with third parties</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        function selectGender(gender) {
+            localStorage.setItem('selectedGender', gender);
+            const card = event.currentTarget;
+            card.style.transform = 'scale(0.96)';
+            card.style.boxShadow = '0 0 80px rgba(255,0,0,0.6)';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.4s ease';
+                document.body.style.opacity = '0';
+                setTimeout(() => { location.href = 'form.html'; }, 400);
+            }, 250);
+        }
+        
+        // Three.js Animation
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        camera.position.z = 22;
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bgCanvas'), alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 0);
+        
+        scene.add(new THREE.AmbientLight(0x0a0a0a, 0.3));
+        const l1 = new THREE.PointLight(0xff0000, 1, 50); l1.position.set(-10, 5, 5); scene.add(l1);
+        const l2 = new THREE.PointLight(0xcc0000, 0.7, 40); l2.position.set(10, -3, 8); scene.add(l2);
+        
+        const helixParts = [];
+        for (let i = 0; i < 180; i++) {
+            const t = i * 0.16;
+            const g = new THREE.SphereGeometry(0.04, 8, 8);
+            const m = new THREE.MeshStandardMaterial({ color: 0xff3333, emissive: 0x330000, emissiveIntensity: 0.8 });
+            const s1 = new THREE.Mesh(g, m);
+            s1.position.set(Math.cos(t)*4.5, t-14, Math.sin(t)*4.5);
+            scene.add(s1); helixParts.push(s1);
+            const s2 = s1.clone();
+            s2.position.set(Math.cos(t+Math.PI)*4.5, t-14, Math.sin(t+Math.PI)*4.5);
+            scene.add(s2); helixParts.push(s2);
+        }
+        
+        const pC = 2000;
+        const pG = new THREE.BufferGeometry();
+        const pP = new Float32Array(pC*3);
+        for (let i=0; i<pC; i++) { pP[i*3]=(Math.random()-0.5)*200; pP[i*3+1]=(Math.random()-0.5)*100; pP[i*3+2]=(Math.random()-0.5)*100-30; }
+        pG.setAttribute('position', new THREE.BufferAttribute(pP, 3));
+        const pM = new THREE.PointsMaterial({ color: 0xff3333, size: 0.06, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+        const particles = new THREE.Points(pG, pM);
+        scene.add(particles);
+        
+        let tRX=0, tRY=0;
+        document.addEventListener('mousemove', (e) => { tRX=(e.clientY/window.innerHeight-0.5)*0.25; tRY=(e.clientX/window.innerWidth-0.5)*0.25; });
+        
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.008;
+            particles.rotation.y = time*0.02;
+            helixParts.forEach(p => { p.position.y += 0.018; if (p.position.y > 15) p.position.y = -15; });
+            l1.position.x = Math.sin(time*0.5)*12;
+            camera.position.x += (tRY*2 - camera.position.x)*0.03;
+            camera.position.y += (-tRX*2 - camera.position.y)*0.03;
+            camera.lookAt(0, 0, 0);
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        window.addEventListener('resize', () => { camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        
+        document.body.classList.add('loaded');
+        setTimeout(() => {
+            const mainContent = document.getElementById('mainContent');
+            if (mainContent) mainContent.classList.add('visible');
+        }, 100);
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Database - Muscle Forge</title>
+    <meta name="description" content="Complete database of exercises with instructions, target muscles, and video guides.">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; }
+        .navbar { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 1300px; background: rgba(0,0,0,0.95); backdrop-filter: blur(25px); border-radius: 60px; padding: 14px 35px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border: 1px solid rgba(255,0,0,0.3); }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; font-family: 'Orbitron', sans-serif; text-decoration: none; color: white; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #ff0000, #cc0000); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .logo-text { background: linear-gradient(135deg, #fff, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { padding: 10px 24px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,0,0,0.3); border-radius: 50px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.4s; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 130px 20px 60px; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 42px; margin-bottom: 10px; }
+        .gradient-text { background: linear-gradient(135deg, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .subtitle { color: rgba(255,255,255,0.6); margin-bottom: 40px; }
+        .exercise-category { margin-bottom: 40px; }
+        .category-title { font-size: 28px; color: #ff0000; margin-bottom: 20px; border-bottom: 1px solid rgba(255,0,0,0.3); padding-bottom: 10px; }
+        .exercise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .exercise-card { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,0,0,0.15); border-radius: 16px; padding: 20px; transition: all 0.3s; }
+        .exercise-card:hover { transform: translateY(-5px); border-color: rgba(255,0,0,0.4); }
+        .exercise-name { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: #ff0000; }
+        .exercise-target { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+        .exercise-desc { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.7); }
+        .footer { background: #000000; padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255,0,0,0.2); margin-top: 40px; }
+        @media (max-width: 768px) { h1 { font-size: 28px; } .container { padding: 100px 15px 40px; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo"><div class="logo-icon">⚡</div><span class="logo-text">MUSCLE FORGE</span></a>
+        <a href="index.html" class="back-btn">← Back to Home</a>
+    </nav>
+    <div class="container">
+        <h1>Exercise <span class="gradient-text">Database</span></h1>
+        <p class="subtitle">Complete guide to exercises with proper form, target muscles, and instructions</p>
+        
+        <div class="exercise-category"><h2 class="category-title">💪 Chest Exercises</h2><div class="exercise-grid">
+            <div class="exercise-card"><div class="exercise-name">Barbell Bench Press</div><div class="exercise-target">🎯 Target: Chest, Triceps, Front Delts</div><div class="exercise-desc">Lie flat on bench, grip bar shoulder-width, lower to chest, press up explosively.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Incline Dumbbell Press</div><div class="exercise-target">🎯 Target: Upper Chest</div><div class="exercise-desc">Set bench to 30-45°, press dumbbells up from chest level.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Push Ups</div><div class="exercise-target">🎯 Target: Chest, Shoulders, Triceps</div><div class="exercise-desc">Keep core tight, body straight, lower chest to floor.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Dumbbell Flyes</div><div class="exercise-target">🎯 Target: Chest</div><div class="exercise-desc">Arms slightly bent, open wide, squeeze at top.</div></div>
+        </div></div>
+        
+        <div class="exercise-category"><h2 class="category-title">🔥 Back Exercises</h2><div class="exercise-grid">
+            <div class="exercise-card"><div class="exercise-name">Deadlift</div><div class="exercise-target">🎯 Target: Lower Back, Hamstrings, Glutes</div><div class="exercise-desc">Hinge at hips, flat back, drive through heels.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Pull Ups</div><div class="exercise-target">🎯 Target: Lats, Biceps</div><div class="exercise-desc">Dead hang, pull elbows to hips, chin above bar.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Lat Pulldown</div><div class="exercise-target">🎯 Target: Lats</div><div class="exercise-desc">Pull bar to upper chest, full stretch at top.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Seated Cable Row</div><div class="exercise-target">🎯 Target: Mid Back</div><div class="exercise-desc">Sit tall, pull to navel, squeeze shoulder blades.</div></div>
+        </div></div>
+        
+        <div class="exercise-category"><h2 class="category-title">🦵 Legs Exercises</h2><div class="exercise-grid">
+            <div class="exercise-card"><div class="exercise-name">Barbell Squat</div><div class="exercise-target">🎯 Target: Quads, Glutes, Hamstrings</div><div class="exercise-desc">Squat to parallel, drive knees out.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Leg Press</div><div class="exercise-target">🎯 Target: Quads, Glutes</div><div class="exercise-desc">Lower until 90° knee angle, press through heels.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Walking Lunges</div><div class="exercise-target">🎯 Target: Quads, Glutes</div><div class="exercise-desc">Step forward, lower back knee to floor.</div></div>
+        </div></div>
+        
+        <div class="exercise-category"><h2 class="category-title">🏋️ Shoulders Exercises</h2><div class="exercise-grid">
+            <div class="exercise-card"><div class="exercise-name">Dumbbell Shoulder Press</div><div class="exercise-target">🎯 Target: Shoulders</div><div class="exercise-desc">Press dumbbells overhead, lower to ear height.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Lateral Raise</div><div class="exercise-target">🎯 Target: Side Delts</div><div class="exercise-desc">Raise to shoulder height, pinkies slightly up.</div></div>
+        </div></div>
+        
+        <div class="exercise-category"><h2 class="category-title">💪 Arms Exercises (Biceps & Triceps)</h2><div class="exercise-grid">
+            <div class="exercise-card"><div class="exercise-name">Barbell Curl</div><div class="exercise-target">🎯 Target: Biceps</div><div class="exercise-desc">Elbows pinned, curl to chin, squeeze at top.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Tricep Pushdown</div><div class="exercise-target">🎯 Target: Triceps</div><div class="exercise-desc">Elbows pinned, push bar down to lockout.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Hammer Curl</div><div class="exercise-target">🎯 Target: Brachialis, Biceps</div><div class="exercise-desc">Neutral grip throughout.</div></div>
+        </div></div>
+        
+        <div class="exercise-category"><h2 class="category-title">🎯 Core Exercises</h2><div class="exercise-grid">
+            <div class="exercise-card"><div class="exercise-name">Crunches</div><div class="exercise-target">🎯 Target: Upper Abs</div><div class="exercise-desc">Curl upper back off floor.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Plank</div><div class="exercise-target">🎯 Target: Core</div><div class="exercise-desc">Keep body straight, engage core.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Leg Raises</div><div class="exercise-target">🎯 Target: Lower Abs</div><div class="exercise-desc">Raise legs to 90°, lower slowly.</div></div>
+        </div></div>
+        
+        <div class="exercise-category"><h2 class="category-title">❤️ Cardio Exercises</h2><div class="exercise-grid">
+            <div class="exercise-card"><div class="exercise-name">Treadmill Running</div><div class="exercise-target">🎯 Target: Cardiovascular Health</div><div class="exercise-desc">Start comfortable pace, increase gradually.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Jump Rope</div><div class="exercise-target">🎯 Target: Cardio, Coordination</div><div class="exercise-desc">Land softly on balls of feet.</div></div>
+            <div class="exercise-card"><div class="exercise-name">Cycling</div><div class="exercise-target">🎯 Target: Lower Body Endurance</div><div class="exercise-desc">Keep steady pace, maintain posture.</div></div>
+        </div></div>
+    </div>
+    <footer class="footer"><p>© 2024 Muscle Forge — Forging Champions Worldwide 🌍</p></footer>
+</body>
+</html>

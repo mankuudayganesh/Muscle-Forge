@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Sitemap: https://muscleforge.netlify.app/sitemap.xml
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /api/
+
+# Crawl delay
+Crawl-delay: 1

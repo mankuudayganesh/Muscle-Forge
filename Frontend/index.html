@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muscle Forge - Forge Your Perfect Physique | Best Gym & Diet Plans</title>
+    <meta name="description" content="India's premier budget-smart fitness transformation platform. Get personalized workout plans, diet plans, and achieve your dream physique.">
+    <meta name="keywords" content="gym workout, diet plan, muscle gain, fat loss, fitness transformation, budget diet">
+    <meta name="author" content="Muscle Forge">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0a0a0a; 
+            overflow-x: hidden; 
+            color: #ffffff;
+            cursor: default;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        
+        body.loaded { opacity: 1; }
+        
+        .gym-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            background: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80') center/cover no-repeat;
+            background-attachment: fixed;
+        }
+        
+        .gym-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.88) 0%, rgba(30,0,0,0.8) 50%, rgba(0,0,0,0.88) 100%);
+        }
+        
+        canvas#bgCanvas { 
+            position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; z-index: 1;
+            pointer-events: none;
+        }
+        
+        .content { position: relative; z-index: 2; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .content.visible { opacity: 1; transform: translateY(0); }
+        
+        .navbar { 
+            position: fixed; top: 20px; left: 50%; 
+            transform: translateX(-50%); 
+            width: 92%; max-width: 1300px; 
+            background: rgba(0,0,0,0.95); 
+            backdrop-filter: blur(25px) saturate(200%); 
+            border-radius: 60px; padding: 14px 35px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 1000; 
+            border: 1px solid rgba(255,0,0,0.4); 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,0,0,0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .navbar.scrolled {
+            background: rgba(0,0,0,0.98);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            padding: 10px 35px;
+            border-color: rgba(255,0,0,0.6);
+        }
+        
+        .logo { 
+            display: flex; align-items: center; gap: 12px; 
+            font-size: 20px; font-weight: 800; 
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .logo-icon { 
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(255,0,0,0.5);
+            animation: logoGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes logoGlow {
+            0%, 100% { box-shadow: 0 4px 15px rgba(255,0,0,0.4); }
+            50% { box-shadow: 0 4px 25px rgba(255,0,0,0.8); }
+        }
+        
+        .logo-text { 
+            background: linear-gradient(135deg, #ffffff 0%, #ff0000 50%, #cc0000 100%); 
+            -webkit-background-clip: text; background-clip: text; color: transparent; 
+        }
+        
+        .nav-links { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; }
+        
+        .nav-links a { 
+            color: rgba(255,255,255,0.8); text-decoration: none; 
+            transition: all 0.4s; font-weight: 500; font-size: 14px;
+            position: relative; padding: 8px 0;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%;
+            width: 0; height: 2px;
+            background: linear-gradient(90deg, #ff0000, #cc0000);
+            transition: all 0.4s;
+            transform: translateX(-50%);
+        }
+        
+        .nav-links a:hover { color: #ff0000; }
+        .nav-links a:hover::after { width: 100%; }
+        
+        .nav-cta { 
+            background: linear-gradient(135deg, #ff0000, #cc0000); 
+            border: none; padding: 11px 26px; 
+            border-radius: 30px; color: white; 
+            cursor: pointer; font-weight: 700; 
+            transition: all 0.4s; font-size: 13px;
+            box-shadow: 0 4px 15px rgba(255,0,0,0.3);
+        }
+        
+        .nav-cta:hover { transform: scale(1.05); box-shadow: 0 8px 30px rgba(255,0,0,0.5); }
+        
+        .hero { 
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; 
+            text-align: center; padding: 120px 20px 60px;
+            position: relative;
+        }
+        
+        .hero-content { max-width: 1000px; position: relative; }
+        
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 22px;
+            background: rgba(255,0,0,0.15);
+            border: 1px solid rgba(255,0,0,0.4);
+            border-radius: 50px;
+            font-size: 12px; font-weight: 700;
+            color: #ff0000;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-badge .dot {
+            width: 8px; height: 8px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        
+        .hero h1 { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 78px; margin-bottom: 24px; 
+            line-height: 1.05; font-weight: 900;
+            text-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        
+        .hero h1 .line1 { display: block; color: #ffffff; }
+        
+        .hero h1 .line2 {
+            display: block;
+            background: linear-gradient(135deg, #ff0000 0%, #ff4444 30%, #ff0000 60%, #cc0000 100%); 
+            -webkit-background-clip: text; background-clip: text; color: transparent; 
+        }
+        
+        .hero-subtitle { 
+            font-size: 20px; margin-bottom: 45px; 
+            opacity: 0.85; font-weight: 400;
+            line-height: 1.7; max-width: 620px;
+            margin-left: auto; margin-right: auto;
+            font-family: 'Rajdhani', sans-serif;
+            text-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        
+        .hero-buttons { 
+            display: flex; gap: 18px; justify-content: center; 
+            margin-bottom: 70px; 
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, #ff0000, #cc0000); 
+            border: none; padding: 17px 42px; 
+            border-radius: 50px; font-size: 15px; 
+            font-weight: 700; color: white; cursor: pointer; 
+            transition: all 0.4s; 
+            box-shadow: 0 4px 20px rgba(255,0,0,0.4);
+        }
+        
+        .btn-primary:hover { 
+            transform: translateY(-4px) scale(1.02); 
+            box-shadow: 0 15px 45px rgba(255,0,0,0.6); 
+        }
+        
+        .btn-secondary { 
+            background: rgba(0,0,0,0.6); 
+            border: 1.5px solid rgba(255,0,0,0.5); 
+            padding: 17px 42px; border-radius: 50px; 
+            font-size: 15px; font-weight: 600; 
+            color: white; cursor: pointer; 
+            transition: all 0.4s; 
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover { 
+            background: rgba(255,0,0,0.2); 
+            transform: translateY(-4px); 
+            border-color: #ff0000;
+        }
+        
+        .stats-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        
+        .stat {
+            padding: 22px 28px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 20px;
+            border: 1px solid rgba(255,0,0,0.3);
+            transition: all 0.5s;
+            min-width: 155px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: rgba(255,0,0,0.6);
+            background: rgba(255,0,0,0.1);
+        }
+        
+        .stat h3 { 
+            font-size: 36px; color: #ff0000; 
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+        }
+        
+        .stat p { font-size: 12px; opacity: 0.7; margin-top: 5px; text-transform: uppercase; font-weight: 600; }
+        
+        .section-title { text-align: center; font-size: 42px; margin-bottom: 15px; font-family: 'Orbitron', sans-serif; font-weight: 800; }
+        .gradient-text { background: linear-gradient(135deg, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .section-subtitle { text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 50px; font-size: 18px; }
+        
+        .features-section { padding: 100px 20px; background: rgba(0,0,0,0.3); }
+        .features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        
+        .feature-card {
+            padding: 35px 25px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,0,0,0.2);
+            transition: all 0.5s;
+            text-align: center;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(255,0,0,0.2);
+        }
+        
+        .feature-icon {
+            width: 70px; height: 70px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, rgba(255,0,0,0.2), rgba(204,0,0,0.2));
+            border-radius: 20px;
+            display: flex;
+            align-items: center; justify-content: center;
+            font-size: 32px;
+            border: 1px solid rgba(255,0,0,0.3);
+        }
+        
+        .feature-card h4 { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+        .feature-card p { font-size: 13px; opacity: 0.7; line-height: 1.6; }
+        
+        .blog-section { padding: 80px 20px; background: rgba(0,0,0,0.5); }
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .blog-card {
+            background: rgba(0,0,0,0.6);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,0,0,0.2);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .blog-card:hover { transform: translateY(-5px); border-color: rgba(255,0,0,0.5); }
+        .blog-card-content { padding: 25px; }
+        .blog-category { color: #ff0000; font-size: 12px; text-transform: uppercase; margin-bottom: 10px; font-weight: 700; }
+        .blog-card h3 { font-size: 18px; margin-bottom: 10px; }
+        .blog-card p { font-size: 13px; opacity: 0.7; margin-bottom: 15px; line-height: 1.6; }
+        .read-more { color: #ff0000; text-decoration: none; font-weight: 700; font-size: 13px; transition: all 0.3s; }
+        .read-more:hover { color: #ff4444; letter-spacing: 1px; }
+        
+        .newsletter-section {
+            background: linear-gradient(135deg, rgba(255,0,0,0.15), rgba(0,0,0,0.9));
+            padding: 60px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255,0,0,0.3);
+            border-bottom: 1px solid rgba(255,0,0,0.3);
+        }
+        .newsletter-form { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 30px; }
+        .newsletter-form input { padding: 15px 25px; width: 320px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,0,0,0.4); border-radius: 50px; color: white; font-size: 16px; }
+        .newsletter-form input:focus { outline: none; border-color: #ff0000; }
+        .newsletter-form button { padding: 15px 35px; background: linear-gradient(135deg, #ff0000, #cc0000); border: none; border-radius: 50px; color: white; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .newsletter-form button:hover { transform: scale(1.02); box-shadow: 0 5px 20px rgba(255,0,0,0.4); }
+        
+        .footer { background: #000000; padding: 60px 20px 30px; border-top: 1px solid rgba(255,0,0,0.3); }
+        .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 45px; max-width: 1200px; margin: 0 auto; }
+        .footer-section h4 { font-family: 'Orbitron', sans-serif; color: #ff0000; margin-bottom: 22px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+        .footer-section p { opacity: 0.6; line-height: 1.7; font-size: 14px; }
+        .footer-section a { display: block; color: rgba(255,255,255,0.6); text-decoration: none; margin: 10px 0; transition: all 0.3s; font-size: 14px; }
+        .footer-section a:hover { color: #ff0000; transform: translateX(5px); }
+        .footer-bottom { text-align: center; margin-top: 40px; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 12px; opacity: 0.5; }
+        .developer-credit { text-align: center; margin-top: 20px; padding-top: 15px; font-size: 12px; color: rgba(255,255,255,0.3); border-top: 1px solid rgba(255,255,255,0.05); }
+        .developer-credit a { color: rgba(255,0,0,0.5); text-decoration: none; transition: all 0.3s; }
+        .developer-credit a:hover { color: #ff0000; letter-spacing: 1px; }
+        
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+        .hamburger span { width: 24px; height: 2px; background: white; border-radius: 2px; }
+        
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: #000000;
+            border-radius: 20px;
+            padding: 25px;
+            z-index: 999;
+            border: 1px solid rgba(255,0,0,0.4);
+            flex-direction: column;
+            gap: 15px;
+        }
+        .mobile-nav.open { display: flex; }
+        .mobile-nav a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 12px; border-radius: 12px; text-align: center; transition: all 0.3s; }
+        .mobile-nav a:hover { background: rgba(255,0,0,0.15); color: #ff0000; }
+        
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-links { display: none; }
+            .hero h1 { font-size: 38px; }
+            .hero-subtitle { font-size: 16px; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .stats-container { flex-direction: column; align-items: center; }
+            .section-title { font-size: 30px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .blog-grid { grid-template-columns: 1fr; }
+        }
+        
+        html { scroll-behavior: smooth; }
+        ::selection { background: rgba(255,0,0,0.4); color: white; }
+    </style>
+</head>
+<body>
+    <div class="gym-bg"></div>
+    <canvas id="bgCanvas"></canvas>
+    
+    <div class="content" id="mainContent">
+        <nav class="navbar" id="navbar">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">⚡</div>
+                <span class="logo-text">MUSCLE FORGE</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="#features">Features</a>
+                <a href="#workouts">Workouts</a>
+                <a href="#diets">Diets</a>
+                <a href="#calculators">Calculators</a>
+                <a href="#blog">Blog</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="dashboard.html" id="dashboardLink" style="display: none;">Dashboard</a>
+                <a href="login.html" id="loginLink">Login</a>
+            </div>
+            <button class="nav-cta" id="startJourneyBtn">Start Journey →</button>
+            <div class="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></div>
+        </nav>
+        
+        <div class="mobile-nav" id="mobileNav">
+            <a href="index.html">Home</a>
+            <a href="#features">Features</a>
+            <a href="#workouts">Workouts</a>
+            <a href="#diets">Diets</a>
+            <a href="#calculators">Calculators</a>
+            <a href="#blog">Blog</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+            <a href="dashboard.html" id="mobileDashboardLink" style="display: none;">Dashboard</a>
+            <a href="login.html" id="mobileLoginLink">Login</a>
+            <a href="gender.html" id="mobileStartJourney">Start Journey →</a>
+        </div>
+
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge"><span class="dot"></span> Created by Uday's</div>
+                <h1><span class="line1">FORGE YOUR</span><span class="line2">PERFECT PHYSIQUE</span></h1>
+                <p class="hero-subtitle">Science-backed workout plans, budget-smart diet plans, and personalized transformation journey.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" id="heroStartBtn">Start Transformation →</button>
+                    <button class="btn-secondary" onclick="document.getElementById('calculators').scrollIntoView({behavior:'smooth'})">⚡ Calculate Needs</button>
+                </div>
+                <div class="stats-container">
+                    <div class="stat"><h3 id="counter1">0</h3><p>Active Users</p></div>
+                    <div class="stat"><h3>₹<span id="counter2">0</span></h3><p>Avg Savings/Month</p></div>
+                    <div class="stat"><h3><span id="counter3">0</span>%</h3><p>Success Rate</p></div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="features" class="features-section">
+            <h2 class="section-title reveal">Why Choose <span class="gradient-text">Muscle Forge</span></h2>
+            <p class="section-subtitle reveal">Trusted by 10,000+ fitness enthusiasts across India</p>
+            <div class="features-grid">
+                <div class="feature-card reveal"><div class="feature-icon">🎯</div><h4>Personalized Plans</h4><p>AI-powered custom workout & diet plans tailored to your body and goals</p></div>
+                <div class="feature-card reveal"><div class="feature-icon">💰</div><h4>Budget Friendly</h4><p>Premium results without premium prices. Plans starting from ₹1500/month</p></div>
+                <div class="feature-card reveal"><div class="feature-icon">📊</div><h4>Smart Tracking</h4><p>Advanced progress tracking with detailed analytics and insights</p></div>
+                <div class="feature-card reveal"><div class="feature-icon">🏆</div><h4>Proven Results</h4><p>92% success rate with 10,000+ transformations completed</p></div>
+            </div>
+        </section>
+
+        <section id="workouts" class="features-section" style="padding-top:0">
+            <h2 class="section-title reveal">Expert <span class="gradient-text">Workout Plans</span></h2>
+            <p class="section-subtitle reveal">Science-backed routines for every fitness level</p>
+            <div class="features-grid">
+                <div class="feature-card reveal"><div class="feature-icon">💪</div><h4>Chest & Triceps</h4><p>Build a powerful upper body with our specialized chest and tricep routines</p></div>
+                <div class="feature-card reveal"><div class="feature-icon">🔥</div><h4>Back & Biceps</h4><p>Develop a V-taper physique with intense back and bicep workouts</p></div>
+                <div class="feature-card reveal"><div class="feature-icon">🦵</div><h4>Leg Day</h4><p>Build strong, powerful legs with our comprehensive leg training programs</p></div>
+                <div class="feature-card reveal"><div class="feature-icon">🏋️</div><h4>Full Body</h4><p>Complete full body workouts for overall strength and conditioning</p></div>
+            </div>
+        </section>
+
+        <section id="diets" class="features-section" style="padding-top:0">
+            <h2 class="section-title reveal">Budget-Smart <span class="gradient-text">Diet Plans</span></h2>
+            <p class="section-subtitle reveal">Nutrition plans that respect your budget</p>
+            <div class="features-grid">
+                <div class="feature-card reveal"><div class="feature-icon">🥩</div><h4>High Protein</h4><p>Build muscle with our affordable high-protein meal plans</p></div>
+                <div class="feature-card reveal"><div class="feature-icon">🥗</div><h4>Vegetarian</h4><p>Complete vegetarian nutrition for muscle gain and fat loss</p></div>
+                <div class="feature-card reveal"><div class="feature-icon">🍗</div><h4>Non-Vegetarian</h4><p>Optimal protein sources for maximum muscle growth</p></div>
+                <div class="feature-card reveal"><div class="feature-icon">💰</div><h4>Budget Friendly</h4><p>Weekly plans starting from ₹1500 - results without breaking the bank</p></div>
+            </div>
+        </section>
+
+        <section id="calculators" class="features-section">
+            <h2 class="section-title reveal">Fitness <span class="gradient-text">Calculators</span></h2>
+            <p class="section-subtitle reveal">Know your numbers, track your progress</p>
+            <div class="calculator-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px,1fr)); gap:25px; max-width:1200px; margin:0 auto">
+                <div class="feature-card reveal"><div class="feature-icon">📊</div><h3>BMI Calculator</h3><input type="number" id="bmiWeight" placeholder="Weight (kg)" style="width:100%; padding:12px; margin:10px 0; background:rgba(0,0,0,0.6); border:1px solid #ff000040; border-radius:10px; color:white"><input type="number" id="bmiHeight" placeholder="Height (cm)" style="width:100%; padding:12px; margin:10px 0; background:rgba(0,0,0,0.6); border:1px solid #ff000040; border-radius:10px; color:white"><button onclick="calculateBMI()" style="width:100%; padding:12px; background:linear-gradient(135deg,#ff0000,#cc0000); border:none; border-radius:10px; color:white; font-weight:700; cursor:pointer">Calculate</button><div id="bmiResult" style="margin-top:15px; padding:12px; background:rgba(0,0,0,0.5); border-radius:10px; text-align:center"></div></div>
+                <div class="feature-card reveal"><div class="feature-icon">🥩</div><h3>Protein Calculator</h3><input type="number" id="proteinWeight" placeholder="Weight (kg)" style="width:100%; padding:12px; margin:10px 0; background:rgba(0,0,0,0.6); border:1px solid #ff000040; border-radius:10px; color:white"><select id="proteinGoal" style="width:100%; padding:12px; margin:10px 0; background:rgba(0,0,0,0.6); border:1px solid #ff000040; border-radius:10px; color:white"><option value="muscle_gain">Muscle Gain</option><option value="fat_loss">Fat Loss</option><option value="maintenance">Maintenance</option></select><button onclick="calculateProtein()" style="width:100%; padding:12px; background:linear-gradient(135deg,#ff0000,#cc0000); border:none; border-radius:10px; color:white; font-weight:700; cursor:pointer">Calculate</button><div id="proteinResult" style="margin-top:15px; padding:12px; background:rgba(0,0,0,0.5); border-radius:10px; text-align:center"></div></div>
+                <div class="feature-card reveal"><div class="feature-icon">🔥</div><h3>Calorie Calculator</h3><input type="number" id="calWeight" placeholder="Weight (kg)" style="width:100%; padding:12px; margin:5px 0; background:rgba(0,0,0,0.6); border:1px solid #ff000040; border-radius:10px; color:white"><input type="number" id="calHeight" placeholder="Height (cm)" style="width:100%; padding:12px; margin:5px 0; background:rgba(0,0,0,0.6); border:1px solid #ff000040; border-radius:10px; color:white"><input type="number" id="calAge" placeholder="Age" style="width:100%; padding:12px; margin:5px 0; background:rgba(0,0,0,0.6); border:1px solid #ff000040; border-radius:10px; color:white"><select id="calGender" style="width:100%; padding:12px; margin:5px 0; background:rgba(0,0,0,0.6); border:1px solid #ff000040; border-radius:10px; color:white"><option value="male">Male</option><option value="female">Female</option></select><button onclick="calculateCalories()" style="width:100%; padding:12px; background:linear-gradient(135deg,#ff0000,#cc0000); border:none; border-radius:10px; color:white; font-weight:700; cursor:pointer">Calculate</button><div id="calResult" style="margin-top:15px; padding:12px; background:rgba(0,0,0,0.5); border-radius:10px; text-align:center"></div></div>
+            </div>
+        </section>
+
+        <section id="blog" class="blog-section">
+            <h2 class="section-title reveal">Latest <span class="gradient-text">Articles</span></h2>
+            <p class="section-subtitle reveal">Expert fitness tips, guides, and transformation stories</p>
+            <div class="blog-grid">
+                <div class="blog-card reveal"><div class="blog-card-content"><div class="blog-category">💪 Muscle Gain</div><h3>How to Gain Muscle on a Budget</h3><p>Learn the science of muscle growth without spending a fortune on supplements and expensive foods.</p><a href="blog/muscle-gain-budget.html" class="read-more">Read More →</a></div></div>
+                <div class="blog-card reveal"><div class="blog-card-content"><div class="blog-category">🔥 Weight Loss</div><h3>7-Day Fat Loss Meal Plan Under ₹1500</h3><p>A complete weekly meal plan designed for fat loss that respects your budget constraints.</p><a href="blog/fat-loss-plan.html" class="read-more">Read More →</a></div></div>
+                <div class="blog-card reveal"><div class="blog-card-content"><div class="blog-category">🏠 Home Workout</div><h3>No Equipment Home Workout for Beginners</h3><p>Effective full-body workout routine you can do at home with zero equipment.</p><a href="blog/home-workout.html" class="read-more">Read More →</a></div></div>
+                <div class="blog-card reveal"><div class="blog-card-content"><div class="blog-category">🥗 Nutrition</div><h3>Complete Guide to Protein for Indians</h3><p>Best protein sources available in India - from paneer to chicken to plant-based options.</p><a href="blog/protein-guide.html" class="read-more">Read More →</a></div></div>
+                <div class="blog-card reveal"><div class="blog-card-content"><div class="blog-category">📝 Tutorial</div><h3>Proper Form for Squats & Deadlifts</h3><p>Master the technique of compound lifts to build muscle safely and effectively.</p><a href="blog/squat-deadlift-form.html" class="read-more">Read More →</a></div></div>
+                <div class="blog-card reveal"><div class="blog-card-content"><div class="blog-category">⚠️ Mistakes</div><h3>10 Gym Mistakes Killing Your Gains</h3><p>Common workout errors that prevent muscle growth and how to fix them.</p><a href="blog/gym-mistakes.html" class="read-more">Read More →</a></div></div>
+            </div>
+        </section>
+
+        <section class="newsletter-section">
+            <h2 class="section-title">Join Our <span class="gradient-text">Newsletter</span></h2>
+            <p>Get weekly fitness tips, diet plans, and transformation stories delivered to your inbox.</p>
+            <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing!'); this.reset();">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit">Subscribe →</button>
+            </form>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section"><h4>Muscle Forge</h4><p>Forging champions since 2024. India's premier budget-smart fitness platform trusted by thousands worldwide.</p><p style="margin-top:15px"><strong>📞</strong> <a href="tel:+918333852136" style="display:inline">+91 8333852136</a><br><strong>📧</strong> <a href="mailto:udayganesh833@gmail.com" style="display:inline">udayganesh833@gmail.com</a></p></div>
+                <div class="footer-section"><h4>Quick Links</h4><a href="#calculators">BMI Calculator</a><a href="#calculators">Protein Calculator</a><a href="gender.html">Start Journey</a><a href="challenge.html">30-Day Challenge</a></div>
+                <div class="footer-section"><h4>Resources</h4><a href="about.html">About Us</a><a href="contact.html">Contact</a><a href="faq.html">FAQ</a><a href="#blog">Blog</a><a href="exercises.html">Exercise DB</a></div>
+                <div class="footer-section"><h4>Legal</h4><a href="privacy-policy.html">Privacy Policy</a><a href="terms.html">Terms & Conditions</a><a href="disclaimer.html">Disclaimer</a><a href="sitemap.xml">Sitemap</a></div>
+                <div class="footer-section"><h4>Connect</h4><a href="#">📷 Instagram</a><a href="#">📘 Facebook</a><a href="#">🐦 Twitter</a><a href="#">📺 YouTube</a></div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 Muscle Forge — Forging Champions Worldwide 🌍 | Designed for India</p>
+            </div>
+            <div class="developer-credit">
+                <p>Developed with <span style="color:#ff0000;">❤️</span> by <a href="#" target="_blank">Uday</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // SIMPLE REDIRECT FUNCTION - This will always redirect to login.html first
+        function startJourney() {
+            // Always redirect to login page first
+            // After successful login, user will be redirected to gender.html
+            localStorage.setItem('redirectAfterLogin', 'gender.html');
+            window.location.href = 'login.html';
+        }
+        
+        function updateAuthUI() {
+            const user = localStorage.getItem('firebaseUser');
+            const dashboardLink = document.getElementById('dashboardLink');
+            const loginLink = document.getElementById('loginLink');
+            
+            if (user) {
+                if (dashboardLink) dashboardLink.style.display = 'block';
+                if (loginLink) loginLink.style.display = 'none';
+            } else {
+                if (dashboardLink) dashboardLink.style.display = 'none';
+                if (loginLink) loginLink.style.display = 'block';
+            }
+        }
+        
+        function selectGender(gender) { localStorage.setItem('selectedGender', gender); location.href = 'gender.html'; }
+        function toggleMobile() { document.getElementById('mobileNav').classList.toggle('open'); }
+        
+        function calculateBMI() {
+            const weight = document.getElementById('bmiWeight').value;
+            const height = document.getElementById('bmiHeight').value;
+            if (!weight || !height) { document.getElementById('bmiResult').innerHTML = '<span style="color:#ffaa00;">Please enter both values</span>'; return; }
+            const bmi = weight / ((height/100) ** 2);
+            let category = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese';
+            let color = bmi < 18.5 ? '#ffaa00' : bmi < 25 ? '#00ff88' : bmi < 30 ? '#ffaa00' : '#ff4444';
+            document.getElementById('bmiResult').innerHTML = `<span style="color:${color}; font-size:18px; font-weight:700">BMI: ${bmi.toFixed(1)}</span><br><span style="color:${color};">${category}</span>`;
+        }
+        
+        function calculateProtein() {
+            const weight = document.getElementById('proteinWeight').value;
+            const goal = document.getElementById('proteinGoal').value;
+            if (!weight) { document.getElementById('proteinResult').innerHTML = '<span style="color:#ffaa00;">Please enter weight</span>'; return; }
+            let protein = goal === 'muscle_gain' ? weight * 2.0 : goal === 'fat_loss' ? weight * 1.8 : weight * 1.6;
+            document.getElementById('proteinResult').innerHTML = `<span style="color:#ff0000; font-size:18px; font-weight:700">${Math.round(protein)}g protein/day</span><br><span style="color:#00ff88;">${Math.round(protein/4)}g per meal</span>`;
+        }
+        
+        function calculateCalories() {
+            const weight = parseFloat(document.getElementById('calWeight').value);
+            const height = parseFloat(document.getElementById('calHeight').value);
+            const age = parseInt(document.getElementById('calAge').value);
+            const gender = document.getElementById('calGender').value;
+            if (!weight || !height || !age) { document.getElementById('calResult').innerHTML = '<span style="color:#ffaa00;">Please fill all fields</span>'; return; }
+            let bmr = gender === 'male' ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age) : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            const maintenance = Math.round(bmr * 1.55);
+            const muscleGain = maintenance + 300;
+            const fatLoss = maintenance - 450;
+            document.getElementById('calResult').innerHTML = `<span style="color:#ff0000;">Maintenance: ${maintenance} kcal</span><br><span style="color:#00ff88;">💪 Muscle Gain: ${muscleGain} kcal</span><br><span style="color:#ffaa00;">🔥 Fat Loss: ${fatLoss} kcal</span>`;
+        }
+        
+        window.addEventListener('scroll', function() { const navbar = document.getElementById('navbar'); if(navbar) navbar.classList.toggle('scrolled', window.scrollY > 50); });
+        
+        function revealAll() { document.querySelectorAll('.reveal').forEach((el, i) => { if(el.getBoundingClientRect().top < window.innerHeight - 60) setTimeout(() => el.classList.add('active'), i * 100); }); }
+        
+        function animateCounter(el, target, suffix = '') { let current = 0; const increment = target / 80; const timer = setInterval(() => { current += increment; if(current >= target) { current = target; clearInterval(timer); } if(el) el.textContent = Math.floor(current).toLocaleString() + suffix; }, 25); }
+        
+        let countersStarted = false;
+        function startCounters() { if(countersStarted) return; const stats = document.querySelector('.stats-container'); if(stats && stats.getBoundingClientRect().top < window.innerHeight) { countersStarted = true; animateCounter(document.getElementById('counter1'), 10000, '+'); animateCounter(document.getElementById('counter2'), 1999); animateCounter(document.getElementById('counter3'), 92); } }
+        
+        function initThreeJS() {
+            const canvas = document.getElementById('bgCanvas'); if(!canvas) return;
+            const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.z = 20; const renderer = new THREE.WebGLRenderer({ canvas, alpha: true }); renderer.setSize(window.innerWidth, window.innerHeight); renderer.setClearColor(0x000000, 0);
+            scene.add(new THREE.AmbientLight(0x0a0a0a, 0.4)); 
+            const pL1 = new THREE.PointLight(0xff0000, 1, 50); pL1.position.set(-8, 5, 5); scene.add(pL1);
+            const pL2 = new THREE.PointLight(0xcc0000, 0.6, 40); pL2.position.set(8, 3, 6); scene.add(pL2);
+            const tkGeo = new THREE.TorusKnotGeometry(2.5, 0.35, 256, 32, 3, 5); 
+            const tkMat = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0x330000, roughness: 0.12, metalness: 0.92 });
+            const torusKnot = new THREE.Mesh(tkGeo, tkMat); scene.add(torusKnot);
+            const pCount = 2000; const pGeo = new THREE.BufferGeometry(); const pPos = new Float32Array(pCount * 3);
+            for(let i=0; i<pCount; i++) { pPos[i*3]=(Math.random()-0.5)*200; pPos[i*3+1]=(Math.random()-0.5)*100; pPos[i*3+2]=(Math.random()-0.5)*100-30; }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+            const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0xff0000, size: 0.06, transparent: true, opacity: 0.4 }));
+            scene.add(particles);
+            let time = 0;
+            function animate() { requestAnimationFrame(animate); time += 0.01; torusKnot.rotation.x = time * 0.3; torusKnot.rotation.y = time * 0.2; particles.rotation.y = time * 0.02; renderer.render(scene, camera); }
+            animate();
+            window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        }
+        
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', function() { 
+            updateAuthUI();
+            document.body.classList.add('loaded'); 
+            setTimeout(() => { const mainContent = document.getElementById('mainContent'); if(mainContent) mainContent.classList.add('visible'); }, 100); 
+            revealAll(); 
+            window.addEventListener('scroll', revealAll); 
+            window.addEventListener('scroll', startCounters); 
+            setTimeout(startCounters, 500); 
+            initThreeJS(); 
+            
+            // Add click event listeners for all Start Journey buttons
+            const startButtons = [
+                document.getElementById('startJourneyBtn'),
+                document.getElementById('heroStartBtn'),
+                document.getElementById('mobileStartJourney')
+            ];
+            
+            startButtons.forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', startJourney);
+                }
+            });
+        });
+        
+        // Make functions global
+        window.calculateBMI = calculateBMI; 
+        window.calculateProtein = calculateProtein; 
+        window.calculateCalories = calculateCalories; 
+        window.toggleMobile = toggleMobile; 
+        window.selectGender = selectGender;
+        window.startJourney = startJourney;
+    </script>
+</body>
+</html>
