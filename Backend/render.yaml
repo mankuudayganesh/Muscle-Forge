@@ -2,20 +2,17 @@ services:
   - type: web
     name: muscle-forge-api
     runtime: python
-    repo: https://github.com/YOUR_USERNAME/muscle-forge-backend
     plan: free
-    branch: main
+    region: oregon
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: muscle-forge-db
-          property: connectionString
-      - key: ALLOWED_ORIGINS
-        value: https://muscleforge.netlify.app,https://www.muscleforge.netlify.app
+      - key: PYTHON_VERSION
+        value: 3.11.0
 
-  - type: postgresql
+  - type: database
     name: muscle-forge-db
     plan: free
-    ipAllowList: []
+    region: oregon
+    databaseName: muscleforge
+    user: muscleforge_user
