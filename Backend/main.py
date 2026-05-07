@@ -33,6 +33,7 @@ app.add_middleware(
         "https://*.netlify.app",
         "https://mankuudayganesh.github.io",
         "https://*.github.io",
+        "https://muscle-forgee.onrender.com",
         "*"  # Allow all during development (can restrict later)
     ],
     allow_credentials=True,
