@@ -325,9 +325,8 @@
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="config.js"></script>
     <script>
-        const API_BASE_URL = 'http://localhost:8000/api';
-        
         function selectGoal(el) { 
             document.querySelectorAll('.goal-option').forEach(o => o.classList.remove('selected')); 
             el.classList.add('selected'); 
@@ -418,7 +417,7 @@
             submitBtn.disabled = true;
             
             try {
-                const response = await fetch(`${API_BASE_URL}/generate-plan`, {
+                const response = await fetch(`${window.API_BASE_URL}/generate-plan`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -454,7 +453,7 @@
             } catch (error) {
                 console.error('Error:', error);
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
-                alert('❌ Failed to generate plan!\n\nMake sure backend is running on port 8000\n\nRun: python main.py\n\nError: ' + error.message);
+                alert('❌ Failed to generate plan!\n\nMake sure backend is running\n\nError: ' + error.message);
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
@@ -485,7 +484,7 @@
             }, 100);
         });
         
-        // Three.js Animation - Black & Red Theme
+        // Three.js Animation
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         camera.position.z = 22;
