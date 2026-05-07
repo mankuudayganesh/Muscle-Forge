@@ -8,11 +8,10 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/muscleforge")
 
-# Create engine with Render-specific settings
 engine = create_engine(
     DATABASE_URL,
     echo=True,
-    pool_pre_ping=True,  # Important for Render
+    pool_pre_ping=True,
     pool_recycle=300,
 )
 
