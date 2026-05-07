@@ -6,13 +6,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Get database URL from environment variable
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/muscleforge")
 
-# For Render's PostgreSQL, the URL format is:
-# postgresql://username:password@host:port/database_name
+# Create engine with Render-specific settings
+engine = create_engine(
+    DATABASE_URL,
+    echo=True,
+    pool_pre_ping=True,  # Important for Render
+    pool_recycle=300,
+)
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
