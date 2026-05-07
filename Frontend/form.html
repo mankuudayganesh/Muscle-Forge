@@ -3,133 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muscle Forge - Your Details</title>
-    <meta name="description" content="Tell us about yourself to get a personalized transformation blueprint">
+    <title>Muscle Forge - Your Plan</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #0a0a0a; overflow-x: hidden; color: white; min-height: 100vh; cursor: default; opacity: 0; transition: opacity 0.6s ease; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; overflow-x: hidden; color: white; min-height: 100vh; opacity: 0; transition: opacity 0.6s ease; }
         body.loaded { opacity: 1; }
         
-        .gym-bg { position: fixed; inset: 0; z-index: 0; background: url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1920&q=80') center/cover no-repeat; background-attachment: fixed; }
+        .gym-bg { position: fixed; inset: 0; z-index: 0; background: url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1920&q=80') center/cover no-repeat; background-attachment: fixed; }
         .gym-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.92) 0%, rgba(30,0,0,0.85) 50%, rgba(0,0,0,0.92) 100%); }
         
         canvas#bgCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
         .content { position: relative; z-index: 2; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
         .content.visible { opacity: 1; transform: translateY(0); }
         
-        .navbar { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 1300px; background: rgba(0,0,0,0.95); backdrop-filter: blur(25px) saturate(200%); border-radius: 60px; padding: 14px 35px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border: 1px solid rgba(255,0,0,0.4); }
+        .navbar { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 1300px; background: rgba(0,0,0,0.95); backdrop-filter: blur(25px) saturate(200%); border-radius: 60px; padding: 14px 35px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border: 1px solid rgba(255,0,0,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
         .logo { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-decoration: none; color: white; }
-        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #ff0000, #cc0000); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 15px rgba(255,0,0,0.4); }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #ff0000, #cc0000); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 15px rgba(255,0,0,0.4); animation: logoPulse 2s ease-in-out infinite; }
+        @keyframes logoPulse { 0%, 100% { box-shadow: 0 4px 15px rgba(255,0,0,0.4); } 50% { box-shadow: 0 4px 25px rgba(255,0,0,0.8); } }
         .logo-text { background: linear-gradient(135deg, #fff, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .nav-actions { display: flex; gap: 10px; align-items: center; }
         .back-btn { display: flex; align-items: center; gap: 8px; padding: 10px 24px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,0,0,0.4); border-radius: 50px; color: white; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.4s; }
         .back-btn:hover { background: rgba(255,0,0,0.15); border-color: #ff0000; }
+        .download-btn { padding: 10px 24px; background: linear-gradient(135deg, #ff0000, #cc0000); border: none; border-radius: 50px; color: white; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.4s; box-shadow: 0 4px 15px rgba(255,0,0,0.3); }
+        .download-btn:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(255,0,0,0.5); }
         
-        .form-container { max-width: 720px; margin: 0 auto; padding: 130px 20px 80px; }
-        .form-header { text-align: center; margin-bottom: 45px; }
-        .form-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: rgba(255,0,0,0.15); border: 1px solid rgba(255,0,0,0.4); border-radius: 50px; font-size: 12px; font-weight: 700; color: #ff0000; margin-bottom: 25px; letter-spacing: 2px; text-transform: uppercase; }
-        .form-header h1 { font-family: 'Orbitron', sans-serif; font-size: 42px; font-weight: 900; margin-bottom: 12px; }
-        .gradient-text { background: linear-gradient(135deg, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 200% 200%; animation: gradientFlow 5s ease infinite; }
-        @keyframes gradientFlow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        .form-header p { font-size: 16px; opacity: 0.6; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
+        .plan-container { max-width: 1400px; margin: 0 auto; padding: 130px 20px 80px; }
+        .plan-header { text-align: center; margin-bottom: 45px; }
+        .plan-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: rgba(255,0,0,0.15); border: 1px solid rgba(255,0,0,0.4); border-radius: 50px; font-size: 12px; font-weight: 700; color: #ff0000; margin-bottom: 25px; letter-spacing: 2px; text-transform: uppercase; animation: badgeGlow 2s infinite; }
+        @keyframes badgeGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0.2); } 50% { box-shadow: 0 0 0 5px rgba(255,0,0,0.1); } }
+        .plan-header h1 { font-family: 'Orbitron', sans-serif; font-size: 46px; font-weight: 900; margin-bottom: 12px; text-shadow: 0 0 20px rgba(0,0,0,0.3); }
+        .gradient-text { background: linear-gradient(135deg, #ff0000, #cc0000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .plan-header p { font-size: 16px; opacity: 0.6; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
         
         .progress-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 45px; }
-        .step-circle { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; position: relative; }
-        .step-circle.active { background: linear-gradient(135deg, #ff0000, #cc0000); box-shadow: 0 0 20px rgba(255,0,0,0.5); }
-        .step-circle.completed { background: linear-gradient(135deg, #00ff88, #00cc66); box-shadow: 0 0 15px rgba(0,255,136,0.3); }
-        .step-circle.inactive { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); }
-        .step-line { width: 70px; height: 2px; background: rgba(255,255,255,0.1); }
-        .step-line.active { background: linear-gradient(90deg, #ff0000, #cc0000); }
-        .step-label { position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%); font-size: 10px; white-space: nowrap; opacity: 0.5; font-weight: 600; }
-        .step-circle.active .step-label { opacity: 1; color: #ff0000; }
-        .step-circle.completed .step-label { opacity: 1; color: #00ff88; }
+        .step-circle { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; position: relative; background: linear-gradient(135deg, #ff0000, #cc0000); box-shadow: 0 0 18px rgba(255,0,0,0.4); }
+        .step-line { width: 70px; height: 2px; background: linear-gradient(90deg, #ff0000, #cc0000); }
+        .step-label { position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%); font-size: 10px; white-space: nowrap; font-weight: 600; color: #ff0000; }
         
-        .form-card { background: rgba(0,0,0,0.6); backdrop-filter: blur(25px); border-radius: 28px; border: 1px solid rgba(255,0,0,0.15); padding: 45px; position: relative; overflow: hidden; }
-        .form-card::before { content: ''; position: absolute; top: 0; right: 0; width: 250px; height: 250px; background: radial-gradient(circle, rgba(255,0,0,0.05) 0%, transparent 70%); pointer-events: none; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 35px; }
+        .stat-card { padding: 22px; background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); border-radius: 20px; border: 1px solid rgba(255,0,0,0.15); text-align: center; transition: all 0.5s; }
+        .stat-card:hover { transform: translateY(-5px); border-color: rgba(255,0,0,0.4); background: rgba(255,0,0,0.05); }
+        .stat-card .stat-icon { font-size: 24px; margin-bottom: 8px; }
+        .stat-card .stat-value { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 800; color: #ff0000; margin-bottom: 4px; }
+        .stat-card .stat-label { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         
-        .form-group { margin-bottom: 24px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: rgba(255,255,255,0.8); letter-spacing: 1px; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
-        .form-group label .required { color: #ff0000; }
+        .day-selector { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 25px; padding-bottom: 10px; scrollbar-width: thin; }
+        .day-btn { padding: 12px 24px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,0,0,0.25); border-radius: 40px; color: white; cursor: pointer; transition: all 0.3s; white-space: nowrap; font-weight: 600; }
+        .day-btn:hover { background: rgba(255,0,0,0.15); border-color: #ff0000; }
+        .day-btn.active { background: linear-gradient(135deg, #ff0000, #cc0000); border-color: transparent; box-shadow: 0 5px 15px rgba(255,0,0,0.4); }
         
-        .input-wrapper { position: relative; }
-        .input-wrapper .icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; opacity: 0.5; z-index: 1; }
+        .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
+        .plan-card { background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255,0,0,0.15); overflow: hidden; transition: all 0.5s; }
+        .plan-card:hover { transform: translateY(-5px); border-color: rgba(255,0,0,0.35); box-shadow: 0 10px 30px rgba(255,0,0,0.1); }
+        .plan-card.full-width { grid-column: 1 / -1; }
         
-        .form-group input, .form-group select { width: 100%; padding: 15px 16px 15px 46px; background: rgba(0,0,0,0.5); border: 1.5px solid rgba(255,0,0,0.2); border-radius: 14px; color: white; font-size: 15px; font-family: 'Inter', sans-serif; transition: all 0.4s; outline: none; }
-        .form-group input:focus, .form-group select:focus { border-color: #ff0000; background: rgba(255,0,0,0.08); box-shadow: 0 0 20px rgba(255,0,0,0.1); }
-        .form-group input::placeholder { color: rgba(255,255,255,0.3); }
-        .form-group select option { background: #0a0a0a; }
+        .plan-card-header { padding: 22px 28px; border-bottom: 1px solid rgba(255,0,0,0.1); display: flex; align-items: center; gap: 14px; }
+        .header-icon { width: 42px; height: 42px; background: linear-gradient(135deg, rgba(255,0,0,0.2), rgba(204,0,0,0.2)); border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(255,0,0,0.2); }
+        .plan-card-header h3 { font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 700; }
+        .card-tag { margin-left: auto; padding: 4px 12px; background: rgba(255,0,0,0.15); border: 1px solid rgba(255,0,0,0.3); border-radius: 20px; font-size: 10px; font-weight: 700; color: #ff0000; letter-spacing: 1px; text-transform: uppercase; }
         
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .plan-card-body { padding: 22px 28px; }
         
-        .goal-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .goal-option { padding: 15px; background: rgba(0,0,0,0.4); border: 1.5px solid rgba(255,0,0,0.15); border-radius: 14px; cursor: pointer; transition: all 0.4s; text-align: center; }
-        .goal-option:hover { border-color: rgba(255,0,0,0.4); background: rgba(255,0,0,0.08); transform: translateY(-2px); }
-        .goal-option.selected { border-color: #ff0000; background: rgba(255,0,0,0.12); box-shadow: 0 0 15px rgba(255,0,0,0.15); }
-        .goal-option .goal-icon { font-size: 26px; margin-bottom: 6px; }
-        .goal-option .goal-label { font-size: 12px; font-weight: 700; }
-        .goal-option input[type="radio"] { display: none; }
+        .meal-item { padding: 18px; background: rgba(255,255,255,0.03); border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; display: flex; gap: 20px; align-items: center; }
+        .meal-item:hover { background: rgba(255,0,0,0.05); border-color: rgba(255,0,0,0.2); transform: translateX(4px); }
+        .meal-image { width: 80px; height: 80px; border-radius: 16px; object-fit: cover; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,0,0,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.3s; }
+        .meal-image:hover { transform: scale(1.05); }
+        .meal-info { flex: 1; }
+        .meal-time { font-size: 11px; font-weight: 700; color: #ff0000; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-family: 'Orbitron', sans-serif; }
+        .meal-name { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+        .meal-macros { font-size: 12px; opacity: 0.6; display: flex; gap: 15px; flex-wrap: wrap; }
         
-        .activity-options { display: flex; flex-direction: column; gap: 8px; }
-        .activity-option { padding: 14px 18px; background: rgba(0,0,0,0.4); border: 1.5px solid rgba(255,0,0,0.15); border-radius: 12px; cursor: pointer; transition: all 0.4s; display: flex; align-items: center; gap: 14px; }
-        .activity-option:hover { border-color: rgba(255,0,0,0.4); background: rgba(255,0,0,0.08); }
-        .activity-option.selected { border-color: #ff0000; background: rgba(255,0,0,0.12); }
-        .activity-option .activity-icon { font-size: 22px; width: 40px; text-align: center; }
-        .activity-option .activity-info h4 { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-        .activity-option .activity-info p { font-size: 11px; opacity: 0.5; }
-        .activity-option input[type="radio"] { display: none; }
+        .workout-item { padding: 20px; background: rgba(255,255,255,0.03); border-radius: 16px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; display: flex; gap: 25px; align-items: center; }
+        .workout-item:hover { background: rgba(255,0,0,0.08); border-color: rgba(255,0,0,0.25); transform: translateX(5px); }
+        .workout-image { width: 100px; height: 100px; border-radius: 16px; object-fit: cover; background: #0a0a0a; border: 2px solid rgba(255,0,0,0.4); box-shadow: 0 8px 20px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.3s; }
+        .workout-image:hover { transform: scale(1.05); border-color: #ff0000; }
+        .workout-info { flex: 1; }
+        .workout-name { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #ff0000; }
+        .exercise-detail { font-size: 13px; opacity: 0.7; margin-bottom: 5px; }
+        .exercise-detail strong { color: #ff4444; font-weight: 700; }
+        .workout-instructions { font-size: 12px; opacity: 0.6; margin-top: 8px; line-height: 1.5; }
         
-        .submit-btn { width: 100%; padding: 17px; background: linear-gradient(135deg, #ff0000, #cc0000); border: none; border-radius: 14px; color: white; font-size: 16px; font-weight: 800; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.4s; margin-top: 8px; position: relative; overflow: hidden; }
-        .submit-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 200%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.6s; }
-        .submit-btn:hover::before { left: 100%; }
-        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(255,0,0,0.5); }
+        .grocery-item { padding: 16px; background: rgba(255,255,255,0.03); border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; display: flex; gap: 18px; align-items: center; }
+        .grocery-item:hover { background: rgba(255,0,0,0.05); border-color: rgba(255,0,0,0.2); transform: translateX(4px); }
+        .grocery-image { width: 65px; height: 65px; border-radius: 14px; object-fit: cover; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,0,0,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; }
+        .grocery-image:hover { transform: scale(1.05); }
+        .grocery-info { flex: 1; }
+        .grocery-name { font-size: 15px; font-weight: 600; margin-bottom: 5px; }
+        .grocery-details { font-size: 12px; opacity: 0.6; }
         
-        .security-note { text-align: center; margin-top: 22px; }
-        .security-note p { opacity: 0.4; font-size: 12px; }
+        .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .tip-item { padding: 18px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; text-align: center; }
+        .tip-item:hover { background: rgba(255,0,0,0.05); border-color: rgba(255,0,0,0.15); transform: translateY(-3px); }
+        .tip-icon { font-size: 28px; margin-bottom: 8px; }
+        .tip-item h4 { font-size: 13px; font-weight: 700; margin-bottom: 5px; color: #ff0000; }
+        .tip-item p { font-size: 11px; opacity: 0.6; line-height: 1.5; }
         
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.97);
-            z-index: 10000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            backdrop-filter: blur(10px);
-        }
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255,0,0,0.2);
-            border-top: 4px solid #ff0000;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        .loading-text {
-            margin-top: 20px;
-            color: white;
-            font-size: 16px;
-            letter-spacing: 2px;
-        }
-        .loading-subtext {
-            margin-top: 10px;
-            color: rgba(255,255,255,0.5);
-            font-size: 12px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .summary-card { background: linear-gradient(135deg, rgba(255,0,0,0.1), rgba(0,0,0,0.7)); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(255,0,0,0.25); padding: 40px; text-align: center; margin-top: 25px; }
+        .summary-card h2 { font-size: 28px; margin-bottom: 15px; }
+        .cta-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary { background: linear-gradient(135deg, #ff0000, #cc0000); border: none; padding: 15px 38px; border-radius: 50px; font-size: 15px; font-weight: 700; color: white; cursor: pointer; transition: all 0.4s; box-shadow: 0 4px 15px rgba(255,0,0,0.3); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(255,0,0,0.5); }
+        .btn-outline { background: transparent; border: 1.5px solid rgba(255,0,0,0.4); padding: 15px 38px; border-radius: 50px; font-size: 15px; font-weight: 600; color: white; cursor: pointer; transition: all 0.4s; }
+        .btn-outline:hover { background: rgba(255,0,0,0.1); border-color: #ff0000; }
+        
+        .disclaimer { text-align: center; margin-top: 35px; padding: 18px; opacity: 0.3; font-size: 11px; }
+        .no-plan-message { text-align: center; padding: 60px; background: rgba(0,0,0,0.5); border-radius: 28px; border: 1px solid rgba(255,0,0,0.2); }
+        .grocery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        
+        .image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.97); z-index: 10000; align-items: center; justify-content: center; cursor: pointer; }
+        .image-modal img { max-width: 90%; max-height: 90%; border-radius: 20px; border: 3px solid #ff0000; box-shadow: 0 0 50px rgba(255,0,0,0.5); }
         
         @media (max-width: 768px) {
-            .form-container { padding: 115px 15px 60px; }
-            .form-card { padding: 28px 18px; }
-            .form-header h1 { font-size: 28px; }
-            .form-row { grid-template-columns: 1fr; }
-            .step-line { width: 35px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .plan-grid { grid-template-columns: 1fr; }
+            .tips-grid { grid-template-columns: 1fr; }
+            .day-btn { padding: 8px 16px; font-size: 12px; }
+            .meal-image { width: 60px; height: 60px; }
+            .workout-image { width: 70px; height: 70px; }
+            .grocery-image { width: 55px; height: 55px; }
+            .meal-name { font-size: 14px; }
+            .workout-name { font-size: 14px; }
         }
         
         ::selection { background: rgba(255,0,0,0.4); color: white; }
@@ -140,463 +134,416 @@
     <div class="gym-bg"></div>
     <canvas id="bgCanvas"></canvas>
     
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">GENERATING YOUR PLAN...</div>
-        <div class="loading-subtext">This may take a few seconds</div>
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <img id="modalImage" src="" alt="Full size">
     </div>
     
     <div class="content" id="mainContent">
         <nav class="navbar">
             <a href="index.html" class="logo"><div class="logo-icon">⚡</div><span class="logo-text">MUSCLE FORGE</span></a>
-            <a href="gender.html" class="back-btn">← Back</a>
+            <div class="nav-actions">
+                <a href="form.html" class="back-btn">← Edit</a>
+                <button class="download-btn" onclick="window.print()">📄 Save Plan</button>
+            </div>
         </nav>
         
-        <div class="form-container">
-            <div class="form-header">
-                <div class="form-badge">STEP 2 OF 3</div>
-                <h1>Tell Us About <span class="gradient-text">You</span></h1>
-                <p>We'll create your personalized transformation blueprint</p>
+        <div class="plan-container">
+            <div class="plan-header">
+                <div class="plan-badge">✓ PLAN GENERATED</div>
+                <h1>Your <span class="gradient-text">Transformation</span> Plan</h1>
+                <p id="planSubtitle">Loading your personalized plan...</p>
             </div>
             
             <div class="progress-bar">
-                <div class="step-circle completed">✓<span class="step-label">Gender</span></div>
-                <div class="step-line active"></div>
-                <div class="step-circle active">2<span class="step-label">Details</span></div>
+                <div class="step-circle">✓<span class="step-label">Gender</span></div>
                 <div class="step-line"></div>
-                <div class="step-circle inactive">3<span class="step-label">Plan</span></div>
+                <div class="step-circle">✓<span class="step-label">Details</span></div>
+                <div class="step-line"></div>
+                <div class="step-circle">✓<span class="step-label">Plan</span></div>
             </div>
             
-            <div class="form-card">
-                <form id="fitnessForm">
-                    <div class="form-group">
-                        <label>Full Name <span class="required">*</span></label>
-                        <div class="input-wrapper">
-                            <input type="text" id="fullName" placeholder="Enter your full name" required>
-                            <span class="icon">👤</span>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Age <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <input type="number" id="age" placeholder="Your age" min="14" max="100" required>
-                                <span class="icon">🎂</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Weight (KG) <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <input type="number" id="weight" placeholder="In kilograms" min="30" max="250" required>
-                                <span class="icon">⚖️</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Height (CM) <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <input type="number" id="height" placeholder="In centimeters" min="100" max="250" required>
-                                <span class="icon">📏</span>
-                            </div>
-                            <small style="opacity:0.5; font-size:11px;">Enter your height in centimeters (e.g., 175)</small>
-                        </div>
-                        <div class="form-group">
-                            <label>Weekly Budget (₹) <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <input type="number" id="budget" placeholder="Enter your weekly food budget" min="500" max="50000" required>
-                                <span class="icon">💰</span>
-                            </div>
-                            <small style="opacity:0.5; font-size:11px;">💰 Daily budget = Weekly Budget ÷ 7</small>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Experience Level <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <select id="experience">
-                                    <option value="beginner">Beginner (0-6 months)</option>
-                                    <option value="intermediate" selected>Intermediate (6-24 months)</option>
-                                    <option value="advanced">Advanced (2+ years)</option>
-                                </select>
-                                <span class="icon">🏋️</span>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Diet Preference <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <select id="diet_preference">
-                                    <option value="veg">Vegetarian</option>
-                                    <option value="nonveg" selected>Non-Vegetarian</option>
-                                </select>
-                                <span class="icon">🥗</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Workout Location <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <select id="workout_location">
-                                    <option value="gym" selected>Gym</option>
-                                    <option value="home">Home</option>
-                                </select>
-                                <span class="icon">📍</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Fitness Goal <span class="required">*</span></label>
-                        <div class="goal-options">
-                            <label class="goal-option" onclick="selectGoal(this)">
-                                <input type="radio" name="goal" value="muscle_gain" required>
-                                <div class="goal-icon">💪</div>
-                                <div class="goal-label">Muscle Gain</div>
-                            </label>
-                            <label class="goal-option" onclick="selectGoal(this)">
-                                <input type="radio" name="goal" value="fat_loss">
-                                <div class="goal-icon">🔥</div>
-                                <div class="goal-label">Fat Loss</div>
-                            </label>
-                            <label class="goal-option" onclick="selectGoal(this)">
-                                <input type="radio" name="goal" value="lean_body">
-                                <div class="goal-icon">🎯</div>
-                                <div class="goal-label">Lean Body</div>
-                            </label>
-                            <label class="goal-option" onclick="selectGoal(this)">
-                                <input type="radio" name="goal" value="maintenance">
-                                <div class="goal-icon">⚡</div>
-                                <div class="goal-label">Maintenance</div>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Activity Level <span class="required">*</span></label>
-                        <div class="activity-options">
-                            <label class="activity-option" onclick="selectActivity(this)">
-                                <input type="radio" name="activity" value="sedentary" required>
-                                <span class="activity-icon">🪑</span>
-                                <div class="activity-info">
-                                    <h4>Sedentary</h4>
-                                    <p>Little or no exercise</p>
-                                </div>
-                            </label>
-                            <label class="activity-option" onclick="selectActivity(this)">
-                                <input type="radio" name="activity" value="light">
-                                <span class="activity-icon">🚶</span>
-                                <div class="activity-info">
-                                    <h4>Lightly Active</h4>
-                                    <p>Light exercise 1-3 days/week</p>
-                                </div>
-                            </label>
-                            <label class="activity-option" onclick="selectActivity(this)">
-                                <input type="radio" name="activity" value="moderate" checked>
-                                <span class="activity-icon">🏃</span>
-                                <div class="activity-info">
-                                    <h4>Moderately Active</h4>
-                                    <p>Moderate exercise 3-5 days/week</p>
-                                </div>
-                            </label>
-                            <label class="activity-option" onclick="selectActivity(this)">
-                                <input type="radio" name="activity" value="very_active">
-                                <span class="activity-icon">🏋️</span>
-                                <div class="activity-info">
-                                    <h4>Very Active</h4>
-                                    <p>Hard exercise 6-7 days/week</p>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="submit-btn">Generate My Plan →</button>
-                </form>
-            </div>
-            <div class="security-note">
-                <p>🔒 Your information is encrypted and secure</p>
-            </div>
+            <div id="planContent"></div>
         </div>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        // ========== BACKEND CONFIGURATION - DIRECT URL ==========
-        const API_BASE_URL = 'https://muscle-forge.onrender.com/api';
+        // ========== BACKEND CONFIGURATION ==========
         const BACKEND_URL = 'https://muscle-forge.onrender.com';
+        const API_BASE_URL = 'https://muscle-forge.onrender.com';
         
         console.log('🔗 Backend URL:', BACKEND_URL);
-        console.log('🔗 API URL:', API_BASE_URL);
         
-        function selectGoal(el) { 
-            document.querySelectorAll('.goal-option').forEach(o => o.classList.remove('selected')); 
-            el.classList.add('selected'); 
-            const radio = el.querySelector('input[type="radio"]'); 
-            if (radio) radio.checked = true; 
+        let currentPlanData = null;
+        let currentDay = 0;
+        const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        
+        // Helper function to get full image URL with backend
+        function getImageUrl(path) {
+            if (!path) return `${BACKEND_URL}/assets/images/default.jpg`;
+            if (path.startsWith('http')) return path;
+            let cleanPath = path.replace(/ /g, '%20');
+            if (!cleanPath.startsWith('/')) {
+                cleanPath = '/' + cleanPath;
+            }
+            return `${BACKEND_URL}${cleanPath}`;
         }
         
-        function selectActivity(el) { 
-            document.querySelectorAll('.activity-option').forEach(o => o.classList.remove('selected')); 
-            el.classList.add('selected'); 
-            const radio = el.querySelector('input[type="radio"]'); 
-            if (radio) radio.checked = true; 
+        function openImageModal(imageUrl) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'flex';
+            modalImg.src = imageUrl;
         }
         
-        async function checkBackend() {
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function loadAndDisplayPlan() {
             try {
-                const response = await fetch(`${BACKEND_URL}/health`);
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('✅ Backend health check passed:', data);
-                    return true;
-                }
-            } catch (error) {
-                console.error('❌ Backend not reachable:', error);
-                return false;
-            }
-            return false;
-        }
-        
-        async function handleSubmit(event) {
-            event.preventDefault();
-            
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            if (loadingOverlay) loadingOverlay.style.display = 'flex';
-            
-            // Check backend health first
-            const isBackendHealthy = await checkBackend();
-            if (!isBackendHealthy) {
-                alert('❌ Cannot connect to backend!\n\nMake sure backend is deployed at:\nhttps://muscle-forge.onrender.com');
-                if (loadingOverlay) loadingOverlay.style.display = 'none';
-                return;
-            }
-            
-            const selectedGoal = document.querySelector('input[name="goal"]:checked');
-            const selectedActivity = document.querySelector('input[name="activity"]:checked');
-            const weeklyBudget = parseFloat(document.getElementById('budget').value);
-            
-            if (isNaN(weeklyBudget) || weeklyBudget < 500) {
-                alert('Please enter a valid weekly budget (minimum ₹500)');
-                if(loadingOverlay) loadingOverlay.style.display = 'none';
-                return;
-            }
-            
-            const height = parseFloat(document.getElementById('height').value);
-            const weight = parseFloat(document.getElementById('weight').value);
-            const age = parseInt(document.getElementById('age').value);
-            
-            if (isNaN(height) || height < 50 || height > 300) {
-                alert('Please enter a valid height between 50-300 cm');
-                if(loadingOverlay) loadingOverlay.style.display = 'none';
-                return;
-            }
-            
-            if (isNaN(weight) || weight < 10 || weight > 500) {
-                alert('Please enter a valid weight between 10-500 kg');
-                if(loadingOverlay) loadingOverlay.style.display = 'none';
-                return;
-            }
-            
-            if (isNaN(age) || age < 10 || age > 120) {
-                alert('Please enter a valid age between 10-120 years');
-                if(loadingOverlay) loadingOverlay.style.display = 'none';
-                return;
-            }
-            
-            const formData = {
-                name: document.getElementById('fullName').value,
-                gender: localStorage.getItem('selectedGender') || 'male',
-                age: age,
-                height: height,
-                weight: weight,
-                budget: weeklyBudget,
-                experience: document.getElementById('experience').value,
-                goal: selectedGoal ? selectedGoal.value : 'muscle_gain',
-                diet_preference: document.getElementById('diet_preference').value,
-                workout_location: document.getElementById('workout_location').value,
-                activity_level: selectedActivity ? selectedActivity.value : 'moderate'
-            };
-            
-            if (!formData.name) { 
-                alert('Please enter your full name'); 
-                if(loadingOverlay) loadingOverlay.style.display = 'none'; 
-                return; 
-            }
-            
-            if (!selectedGoal) { 
-                alert('Please select a fitness goal'); 
-                if(loadingOverlay) loadingOverlay.style.display = 'none'; 
-                return; 
-            }
-            
-            if (!selectedActivity) { 
-                alert('Please select your activity level'); 
-                if(loadingOverlay) loadingOverlay.style.display = 'none'; 
-                return; 
-            }
-            
-            const submitBtn = document.querySelector('.submit-btn');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span>⏳ Generating Plan...</span>';
-            submitBtn.disabled = true;
-            
-            try {
-                console.log('📤 Sending request to:', `${API_BASE_URL}/generate-plan`);
-                console.log('📦 Form data:', formData);
+                const planData = JSON.parse(localStorage.getItem('userPlan'));
+                const planContent = document.getElementById('planContent');
+                const planSubtitle = document.getElementById('planSubtitle');
                 
-                const response = await fetch(`${API_BASE_URL}/generate-plan`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
+                console.log('📋 Loading plan data:', planData);
+                
+                if (!planData || !planData.success) {
+                    if (planContent) {
+                        planContent.innerHTML = `
+                            <div class="no-plan-message">
+                                <h2 style="color:#ffaa00; margin-bottom:15px;">❌ No Plan Found</h2>
+                                <p>Please go back and generate a plan first.</p>
+                                <button onclick="location.href='form.html'" style="margin-top:20px; padding:12px 35px; background:#ff0000; border:none; border-radius:30px; color:white; cursor:pointer;">
+                                    Generate Plan →
+                                </button>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+                
+                currentPlanData = planData;
+                const dailyBudget = (planData.weekly_budget / 7).toFixed(2);
+                
+                if (planSubtitle) {
+                    planSubtitle.textContent = `Customized plan for ${planData.name || 'Athlete'} | Weekly: ₹${planData.weekly_budget} (₹${dailyBudget}/day) | ${planData.diet_preference === 'veg' ? 'Vegetarian' : 'Non-Vegetarian'}`;
+                }
+                
+                // Stats Grid
+                const statsHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value">${planData.target_calories || 2000}</div><div class="stat-label">Daily Calories</div></div>
+                        <div class="stat-card"><div class="stat-icon">🥩</div><div class="stat-value">${planData.target_protein || 120}g</div><div class="stat-label">Protein Target</div></div>
+                        <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-value">₹${dailyBudget}</div><div class="stat-label">Daily Budget</div></div>
+                        <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-value">₹${planData.weekly_budget || 0}</div><div class="stat-label">Weekly Budget</div></div>
+                    </div>
+                `;
+                
+                // Day Selector
+                const meals = planData.daily_meals || [];
+                let daySelectorHTML = '<div class="day-selector">';
+                for (let i = 0; i < meals.length; i++) {
+                    daySelectorHTML += `<button class="day-btn ${i === 0 ? 'active' : ''}" onclick="showDay(${i})">${dayNames[i]} (Day ${i + 1})</button>`;
+                }
+                daySelectorHTML += '</div>';
+                
+                // Show first day content
+                let dayContentHTML = '';
+                if (meals.length > 0) {
+                    dayContentHTML = generateDayContent(0, planData);
+                }
+                
+                // Tips
+                let tipsHTML = '';
+                const tips = planData.tips || [];
+                tips.forEach(tip => {
+                    tipsHTML += `
+                        <div class="tip-item">
+                            <div class="tip-icon">${tip.icon || '💪'}</div>
+                            <h4>${escapeHtml(tip.title || 'Tip')}</h4>
+                            <p>${escapeHtml(tip.desc || 'Stay consistent for best results')}</p>
+                        </div>
+                    `;
                 });
                 
-                console.log('📥 Response status:', response.status);
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Server error: ${response.status} - ${errorText}`);
+                // Grocery List
+                let groceryHTML = '';
+                const groceryList = planData.grocery_list || [];
+                if (groceryList.length > 0) {
+                    groceryList.forEach(item => {
+                        const imageUrl = getImageUrl(item.image_url);
+                        groceryHTML += `
+                            <div class="grocery-item">
+                                <img class="grocery-image" src="${imageUrl}" alt="${escapeHtml(item.item)}" onclick="event.stopPropagation(); openImageModal('${imageUrl}')" onerror="this.src='${BACKEND_URL}/assets/images/default.jpg'">
+                                <div class="grocery-info">
+                                    <div class="grocery-name">${escapeHtml(item.item)} ${item.hindi_name ? '(' + escapeHtml(item.hindi_name) + ')' : ''}</div>
+                                    <div class="grocery-details">💰 ₹${item.cost} | 📦 ${item.quantity || '1x'}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    groceryHTML = '<p style="text-align:center;">Grocery recommendations loading...</p>';
                 }
                 
-                const planData = await response.json();
-                console.log('✅ Plan generated successfully!');
+                const summaryHTML = `
+                    <div class="summary-card">
+                        <h2>Ready to <span class="gradient-text">Transform?</span></h2>
+                        <p>Follow this plan consistently for 30 days and witness remarkable changes in your physique and energy levels.</p>
+                        <div class="cta-buttons">
+                            <button class="btn-primary" onclick="window.print()">📥 Download Full Plan</button>
+                            <button class="btn-outline" onclick="location.href='index.html'">🏠 Back to Home</button>
+                        </div>
+                    </div>
+                    <div class="disclaimer">⚠️ This plan is based on general fitness principles. Consult a healthcare professional before starting any new program. Individual results may vary.</div>
+                `;
                 
-                localStorage.setItem('userPlan', JSON.stringify({
-                    success: true,
-                    ...planData,
-                    weekly_budget: weeklyBudget,
-                    daily_budget: weeklyBudget / 7,
-                    name: formData.name,
-                    gender: formData.gender,
-                    diet_preference: formData.diet_preference
-                }));
-                
-                submitBtn.innerHTML = '✓ Plan Generated!';
-                submitBtn.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
-                
-                setTimeout(() => {
-                    window.location.href = 'plan.html';
-                }, 500);
+                planContent.innerHTML = statsHTML + daySelectorHTML + dayContentHTML + `
+                    <div class="plan-card full-width">
+                        <div class="plan-card-header"><div class="header-icon">🛒</div><h3>Weekly Grocery List</h3><span class="card-tag">₹${planData.weekly_cost || planData.weekly_budget || 0} Total</span></div>
+                        <div class="plan-card-body"><div class="grocery-grid">${groceryHTML}</div></div>
+                    </div>
+                    <div class="plan-card full-width">
+                        <div class="plan-card-header"><div class="header-icon">💡</div><h3>Pro Tips for Success</h3><span class="card-tag">Essential</span></div>
+                        <div class="plan-card-body"><div class="tips-grid">${tipsHTML}</div></div>
+                    </div>
+                ` + summaryHTML;
                 
             } catch (error) {
-                console.error('❌ Error:', error);
-                if (loadingOverlay) loadingOverlay.style.display = 'none';
-                alert('❌ Failed to generate plan!\n\nError: ' + error.message + '\n\nBackend: ' + BACKEND_URL);
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+                console.error('Error loading plan:', error);
+                document.getElementById('planContent').innerHTML = `
+                    <div class="no-plan-message">
+                        <h2 style="color:#ff4444; margin-bottom:15px;">❌ Error Loading Plan</h2>
+                        <p>${error.message}</p>
+                        <button onclick="location.href='form.html'" style="margin-top:20px; padding:12px 35px; background:#ff0000; border:none; border-radius:30px; color:white; cursor:pointer;">
+                            Go Back →
+                        </button>
+                    </div>
+                `;
             }
+        }
+        
+        function generateDayContent(dayIndex, planData) {
+            const meals = planData.daily_meals || [];
+            const workouts = planData.daily_workout || [];
+            const currentMeal = meals[dayIndex];
+            const currentWorkout = workouts[dayIndex];
+            
+            if (!currentMeal) return '<p>No meal data available.</p>';
+            
+            // Meals HTML
+            let mealsHTML = '';
+            const mealKeys = ['breakfast', 'lunch', 'dinner', 'snacks'];
+            const mealLabels = {
+                breakfast: { icon: '🌅', name: 'BREAKFAST', time: '7:00 AM' },
+                lunch: { icon: '☀️', name: 'LUNCH', time: '1:00 PM' },
+                dinner: { icon: '🌙', name: 'DINNER', time: '8:00 PM' },
+                snacks: { icon: '🍌', name: 'SNACKS', time: '4:30 PM' }
+            };
+            
+            mealKeys.forEach(mealKey => {
+                const meal = currentMeal[mealKey];
+                if (meal) {
+                    const imageUrl = getImageUrl(meal.image_url);
+                    const label = mealLabels[mealKey];
+                    mealsHTML += `
+                        <div class="meal-item">
+                            <img class="meal-image" src="${imageUrl}" alt="${escapeHtml(meal.name)}" onclick="event.stopPropagation(); openImageModal('${imageUrl}')" onerror="this.src='${BACKEND_URL}/assets/images/default.jpg'">
+                            <div class="meal-info">
+                                <div class="meal-time">${label.icon} ${label.name} · ${label.time}</div>
+                                <div class="meal-name">${escapeHtml(meal.name)} ${meal.hindi_name ? '(' + escapeHtml(meal.hindi_name) + ')' : ''}</div>
+                                <div class="meal-macros">
+                                    <span>🔥 ${meal.calories || 0} kcal</span>
+                                    <span>🥩 ${meal.protein || 0}g Protein</span>
+                                    <span>💰 ₹${meal.price || 0}</span>
+                                    <span>📦 ${meal.serving_size || '1 serving'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            mealsHTML += `
+                <div class="meal-item" style="background: rgba(255,0,0,0.05);">
+                    <div class="meal-info">
+                        <div class="meal-time">💰 DAILY SUMMARY</div>
+                        <div class="meal-name">Budget: ₹${currentMeal.daily_budget || planData.daily_budget}</div>
+                        <div class="meal-macros">
+                            <span>🔥 Total Calories: ${currentMeal.calories || planData.target_calories} kcal</span>
+                            <span>🥩 Total Protein: ${currentMeal.protein || planData.target_protein}g</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Workouts HTML
+            let workoutsHTML = '';
+            if (currentWorkout) {
+                if (currentWorkout.rest) {
+                    workoutsHTML = `
+                        <div class="workout-item">
+                            <div class="workout-info">
+                                <div class="workout-name">🔄 ${currentWorkout.focus || 'REST DAY'}</div>
+                                <div class="exercise-detail">${currentWorkout.message || 'Take rest and recharge. Have a balanced cheat meal today!'}</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (currentWorkout.exercises && currentWorkout.exercises.length > 0) {
+                    currentWorkout.exercises.forEach(ex => {
+                        const imageUrl = getImageUrl(ex.image_url);
+                        workoutsHTML += `
+                            <div class="workout-item">
+                                <img class="workout-image" src="${imageUrl}" alt="${escapeHtml(ex.name)}" onclick="event.stopPropagation(); openImageModal('${imageUrl}')" onerror="this.src='${BACKEND_URL}/assets/images/default.jpg'">
+                                <div class="workout-info">
+                                    <div class="workout-name">🏋️ ${escapeHtml(ex.name)}</div>
+                                    <div class="exercise-detail"><strong>${ex.sets} sets</strong> × ${ex.reps} reps · ${ex.weight}</div>
+                                    <div class="workout-instructions">📝 ${ex.instructions ? escapeHtml(ex.instructions.substring(0, 150)) + (ex.instructions.length > 150 ? '...' : '') : 'Maintain proper form throughout'}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    workoutsHTML = `
+                        <div class="workout-item">
+                            <div class="workout-info">
+                                <div class="workout-name">🏋️ ${currentWorkout.focus || 'Workout'}</div>
+                                <div class="exercise-detail">Complete your daily workout routine</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            if (!workoutsHTML) {
+                workoutsHTML = `
+                    <div class="workout-item">
+                        <div class="workout-info">
+                            <div class="workout-name">Complete your daily workout</div>
+                            <div class="exercise-detail">Stay consistent for best results</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="plan-grid">
+                    <div class="plan-card">
+                        <div class="plan-card-header"><div class="header-icon">🍽️</div><h3>${dayNames[dayIndex]} (Day ${dayIndex + 1}) Meal Plan</h3><span class="card-tag">${planData.diet_preference === 'veg' ? 'Vegetarian' : 'Non-Vegetarian'}</span></div>
+                        <div class="plan-card-body">${mealsHTML}</div>
+                    </div>
+                    <div class="plan-card">
+                        <div class="plan-card-header"><div class="header-icon">🏋️</div><h3>${dayNames[dayIndex]} (Day ${dayIndex + 1}) Workout</h3><span class="card-tag">${currentWorkout?.focus || 'Workout'}</span></div>
+                        <div class="plan-card-body">${workoutsHTML}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showDay(dayIndex) {
+            if (!currentPlanData) return;
+            currentDay = dayIndex;
+            
+            const btns = document.querySelectorAll('.day-btn');
+            btns.forEach((btn, i) => {
+                if (i === dayIndex) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            
+            const dayContent = generateDayContent(dayIndex, currentPlanData);
+            const existingGrid = document.querySelector('.plan-grid');
+            if (existingGrid) {
+                existingGrid.outerHTML = dayContent;
+            } else {
+                const planContent = document.getElementById('planContent');
+                const statsGrid = document.querySelector('.stats-grid');
+                const daySelector = document.querySelector('.day-selector');
+                if (statsGrid && daySelector && planContent) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = dayContent;
+                    const newGrid = tempDiv.firstChild;
+                    const groceryCard = document.querySelector('.plan-card.full-width');
+                    if (groceryCard) {
+                        planContent.insertBefore(newGrid, groceryCard);
+                    } else {
+                        planContent.appendChild(newGrid);
+                    }
+                }
+            }
+        }
+        
+        function initThreeJS() {
+            const canvas = document.getElementById('bgCanvas');
+            if (!canvas) return;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 20;
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            scene.add(new THREE.AmbientLight(0x0a0a0a, 0.4));
+            const pL1 = new THREE.PointLight(0xff0000, 1, 50);
+            pL1.position.set(-8, 5, 5);
+            scene.add(pL1);
+            const pL2 = new THREE.PointLight(0xcc0000, 0.6, 40);
+            pL2.position.set(8, 3, 6);
+            scene.add(pL2);
+            const tkGeo = new THREE.TorusKnotGeometry(2.5, 0.35, 256, 32, 3, 5);
+            const tkMat = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0x330000, roughness: 0.12, metalness: 0.92 });
+            const torusKnot = new THREE.Mesh(tkGeo, tkMat);
+            scene.add(torusKnot);
+            const pCount = 2000;
+            const pGeo = new THREE.BufferGeometry();
+            const pPos = new Float32Array(pCount * 3);
+            for (let i = 0; i < pCount; i++) {
+                pPos[i*3] = (Math.random()-0.5) * 200;
+                pPos[i*3+1] = (Math.random()-0.5) * 100;
+                pPos[i*3+2] = (Math.random()-0.5) * 100 - 30;
+            }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+            const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ color: 0xff3333, size: 0.06, transparent: true, opacity: 0.4 }));
+            scene.add(particles);
+            let time = 0;
+            function animate() {
+                requestAnimationFrame(animate);
+                time += 0.01;
+                torusKnot.rotation.x = time * 0.3;
+                torusKnot.rotation.y = time * 0.2;
+                particles.rotation.y = time * 0.02;
+                renderer.render(scene, camera);
+            }
+            animate();
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('📄 Form page loaded');
-            
-            // Test backend connection on load
-            fetch(`${BACKEND_URL}/health`)
-                .then(res => res.json())
-                .then(data => console.log('🏥 Backend health:', data))
-                .catch(err => console.error('⚠️ Backend not reachable on load:', err));
-            
-            const defaultGoal = document.querySelector('.goal-option input[value="muscle_gain"]');
-            if (defaultGoal) { 
-                defaultGoal.checked = true; 
-                defaultGoal.closest('.goal-option').classList.add('selected'); 
-            }
-            
-            const defaultActivity = document.querySelector('.activity-option input[value="moderate"]');
-            if (defaultActivity) { 
-                defaultActivity.checked = true; 
-                defaultActivity.closest('.activity-option').classList.add('selected'); 
-            }
-            
-            const form = document.getElementById('fitnessForm');
-            if (form) {
-                form.addEventListener('submit', handleSubmit);
-            }
+            console.log('📄 Plan page loaded');
+            console.log('🔗 Backend URL:', BACKEND_URL);
             
             document.body.classList.add('loaded');
             setTimeout(() => {
                 const mainContent = document.getElementById('mainContent');
                 if (mainContent) mainContent.classList.add('visible');
             }, 100);
+            loadAndDisplayPlan();
+            initThreeJS();
         });
         
-        // Three.js Animation
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        camera.position.z = 22;
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bgCanvas'), alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setClearColor(0x000000, 0);
-        
-        scene.add(new THREE.AmbientLight(0x0a0a0a, 0.4));
-        const l1 = new THREE.PointLight(0xff0000, 0.9, 50); 
-        l1.position.set(-10, 5, 5); 
-        scene.add(l1);
-        const l2 = new THREE.PointLight(0xcc0000, 0.6, 40);
-        l2.position.set(10, -2, 7);
-        scene.add(l2);
-        
-        const grid = new THREE.GridHelper(80, 40, 0x330000, 0x1a0000);
-        grid.position.y = -10; 
-        scene.add(grid);
-        
-        const octahedrons = [];
-        for (let i = 0; i < 15; i++) {
-            const g = new THREE.OctahedronGeometry(0.25 + Math.random()*0.4, 0);
-            const m = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0x330000, emissiveIntensity: 0.7, wireframe: Math.random()>0.7, transparent: true, opacity: 0.6 });
-            const mesh = new THREE.Mesh(g, m);
-            mesh.position.set((Math.random()-0.5)*35, (Math.random()-0.5)*18, (Math.random()-0.5)*18-10);
-            mesh.userData = { sx: (Math.random()-0.5)*0.01, sy: (Math.random()-0.5)*0.01 };
-            scene.add(mesh); 
-            octahedrons.push(mesh);
-        }
-        
-        const pC = 2000;
-        const pG = new THREE.BufferGeometry();
-        const pP = new Float32Array(pC*3);
-        for (let i=0; i<pC; i++) { 
-            pP[i*3]=(Math.random()-0.5)*180; 
-            pP[i*3+1]=(Math.random()-0.5)*90; 
-            pP[i*3+2]=(Math.random()-0.5)*90-30; 
-        }
-        pG.setAttribute('position', new THREE.BufferAttribute(pP, 3));
-        scene.add(new THREE.Points(pG, new THREE.PointsMaterial({ color: 0xff3333, size: 0.05, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending })));
-        
-        let tRX=0, tRY=0;
-        document.addEventListener('mousemove', (e)=>{ 
-            tRX=(e.clientY/window.innerHeight-0.5)*0.2; 
-            tRY=(e.clientX/window.innerWidth-0.5)*0.2; 
-        });
-        
-        let time = 0;
-        function animate() {
-            requestAnimationFrame(animate);
-            time += 0.008;
-            octahedrons.forEach(o => { 
-                o.rotation.x += o.userData.sx; 
-                o.rotation.y += o.userData.sy; 
-                o.position.y += Math.sin(time*2+o.position.x)*0.003; 
-            });
-            camera.position.x += (tRY*2 - camera.position.x)*0.02;
-            camera.position.y += (-tRX*2 - camera.position.y)*0.02;
-            camera.lookAt(0,0,0);
-            renderer.render(scene, camera);
-        }
-        animate();
-        
-        window.addEventListener('resize', () => { 
-            camera.aspect=window.innerWidth/window.innerHeight; 
-            camera.updateProjectionMatrix(); 
-            renderer.setSize(window.innerWidth, window.innerHeight); 
-        });
+        window.showDay = showDay;
+        window.openImageModal = openImageModal;
+        window.closeImageModal = closeImageModal;
     </script>
 </body>
 </html>
