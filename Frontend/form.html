@@ -325,8 +325,14 @@
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="config.js"></script>
     <script>
+        // ========== BACKEND CONFIGURATION - DIRECT URL ==========
+        const API_BASE_URL = 'https://muscle-forge.onrender.com/api';
+        const BACKEND_URL = 'https://muscle-forge.onrender.com';
+        
+        console.log('🔗 Backend URL:', BACKEND_URL);
+        console.log('🔗 API URL:', API_BASE_URL);
+        
         function selectGoal(el) { 
             document.querySelectorAll('.goal-option').forEach(o => o.classList.remove('selected')); 
             el.classList.add('selected'); 
@@ -341,11 +347,34 @@
             if (radio) radio.checked = true; 
         }
         
+        async function checkBackend() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Backend health check passed:', data);
+                    return true;
+                }
+            } catch (error) {
+                console.error('❌ Backend not reachable:', error);
+                return false;
+            }
+            return false;
+        }
+        
         async function handleSubmit(event) {
             event.preventDefault();
             
             const loadingOverlay = document.getElementById('loadingOverlay');
             if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            
+            // Check backend health first
+            const isBackendHealthy = await checkBackend();
+            if (!isBackendHealthy) {
+                alert('❌ Cannot connect to backend!\n\nMake sure backend is deployed at:\nhttps://muscle-forge.onrender.com');
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+                return;
+            }
             
             const selectedGoal = document.querySelector('input[name="goal"]:checked');
             const selectedActivity = document.querySelector('input[name="activity"]:checked');
@@ -417,7 +446,10 @@
             submitBtn.disabled = true;
             
             try {
-                const response = await fetch(`${window.API_BASE_URL}/generate-plan`, {
+                console.log('📤 Sending request to:', `${API_BASE_URL}/generate-plan`);
+                console.log('📦 Form data:', formData);
+                
+                const response = await fetch(`${API_BASE_URL}/generate-plan`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -426,12 +458,15 @@
                     body: JSON.stringify(formData)
                 });
                 
+                console.log('📥 Response status:', response.status);
+                
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`Server error: ${response.status} - ${errorText}`);
                 }
                 
                 const planData = await response.json();
+                console.log('✅ Plan generated successfully!');
                 
                 localStorage.setItem('userPlan', JSON.stringify({
                     success: true,
@@ -451,15 +486,23 @@
                 }, 500);
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('❌ Error:', error);
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
-                alert('❌ Failed to generate plan!\n\nMake sure backend is running\n\nError: ' + error.message);
+                alert('❌ Failed to generate plan!\n\nError: ' + error.message + '\n\nBackend: ' + BACKEND_URL);
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
         }
         
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 Form page loaded');
+            
+            // Test backend connection on load
+            fetch(`${BACKEND_URL}/health`)
+                .then(res => res.json())
+                .then(data => console.log('🏥 Backend health:', data))
+                .catch(err => console.error('⚠️ Backend not reachable on load:', err));
+            
             const defaultGoal = document.querySelector('.goal-option input[value="muscle_gain"]');
             if (defaultGoal) { 
                 defaultGoal.checked = true; 
