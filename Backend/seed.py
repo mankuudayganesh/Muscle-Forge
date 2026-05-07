@@ -5,12 +5,18 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Drop and recreate tables
-models.Base.metadata.drop_all(bind=engine)
+# DON'T drop tables - just create if not exist
 models.Base.metadata.create_all(bind=engine)
 
 def seed_exercises():
     db = SessionLocal()
+    
+    # Check if already seeded
+    existing = db.query(models.Exercise).count()
+    if existing > 0:
+        logger.info(f"Exercises already exist ({existing}), skipping seed")
+        db.close()
+        return
     
     exercises = [
         # CHEST
@@ -77,8 +83,15 @@ def seed_exercises():
 def seed_foods():
     db = SessionLocal()
     
+    # Check if already seeded
+    existing = db.query(models.Food).count()
+    if existing > 0:
+        logger.info(f"Foods already exist ({existing}), skipping seed")
+        db.close()
+        return
+    
     foods = [
-        # FRUITS (Common for both)
+        # FRUITS
         ("Apple", "Seb", 140, "kg", 0.5, 95, 25, 0.3, "1 medium", True, 14, "fruits", "/assets/images/foods/fruits/apple.jpg"),
         ("Banana", "Kela", 40, "kg", 1.1, 105, 27, 0.4, "1 medium", True, 4, "fruits", "/assets/images/foods/fruits/Banana (3).jpg"),
         ("Orange", "Santra", 80, "kg", 1.2, 62, 15, 0.2, "1 medium", True, 8, "fruits", "/assets/images/foods/fruits/orange.jpg"),
@@ -88,20 +101,20 @@ def seed_foods():
         ("Papaya", "Papita", 35, "kg", 0.5, 43, 11, 0.3, "100g", True, 3.5, "fruits", "/assets/images/foods/fruits/papaya.jpg"),
         ("Grapes", "Angoor", 100, "kg", 0.7, 69, 18, 0.2, "100g", True, 10, "fruits", "/assets/images/foods/fruits/grapes.jpg"),
         
-        # DRY FRUITS (Common for both)
+        # DRY FRUITS
         ("Almonds", "Badam", 1100, "kg", 21, 579, 22, 49, "30g", True, 110, "dry_fruits", "/assets/images/foods/dry_fruits/almonds.jpg"),
         ("Cashews", "Kaju", 1000, "kg", 18, 553, 30, 44, "30g", True, 100, "dry_fruits", "/assets/images/foods/dry_fruits/cashews.jpg"),
         ("Walnuts", "Akhrot", 1200, "kg", 15, 654, 14, 65, "30g", True, 120, "dry_fruits", "/assets/images/foods/dry_fruits/walnuts.jpg"),
         ("Peanuts", "Moongphali", 100, "kg", 26, 567, 16, 49, "30g", True, 10, "dry_fruits", "/assets/images/foods/dry_fruits/peanuts.jpg"),
         
-        # DAIRY (Common for both)
+        # DAIRY
         ("Paneer", "Paneer", 350, "kg", 18, 265, 6, 21, "100g", True, 35, "dairy", "/assets/images/foods/dairy/paneer.jpg"),
         ("Milk", "Doodh", 60, "liter", 8, 150, 12, 8, "250ml", True, 6, "dairy", "/assets/images/foods/dairy/full fatty milk.jpg"),
         ("Whey Protein", "Whey Protein", 2500, "kg", 75, 380, 5, 6, "30g scoop", True, 250, "dairy", "/assets/images/foods/dairy/whey-protein.jpg"),
         ("Oats", "Oats", 80, "kg", 12, 350, 60, 5, "40g", True, 8, "breakfast", "/assets/images/foods/dairy/oats.jpg"),
         ("Peanut Butter", "Peanut Butter", 250, "500g", 25, 590, 20, 50, "20g", True, 25, "dry_fruits", "/assets/images/foods/dairy/peanut-butter.jpg"),
         
-        # VEGETABLES (Veg only)
+        # VEGETABLES
         ("Broccoli", "Broccoli", 70, "kg", 2.8, 34, 7, 0.4, "100g", True, 7, "vegetables", "/assets/images/foods/vegetables/Broccoli.jpg"),
         ("Spinach", "Palak", 15, "kg", 2.9, 23, 3.6, 0.4, "100g", True, 1.5, "vegetables", "/assets/images/foods/vegetables/Spinach.jpg"),
         ("Carrot", "Gajar", 45, "kg", 0.9, 41, 10, 0.2, "100g", True, 4.5, "vegetables", "/assets/images/foods/vegetables/Carrot.jpg"),
@@ -113,7 +126,7 @@ def seed_foods():
         ("Mushroom", "Khumb", 100, "kg", 3.1, 22, 3.3, 0.3, "100g", True, 10, "vegetables", "/assets/images/foods/vegetables/Mushroom.jpg"),
         ("Soya Chunks", "Soya Badi", 150, "kg", 52, 345, 33, 0.5, "100g", True, 15, "vegetables", "/assets/images/foods/vegetables/Soya Chunks.jpg"),
         
-        # NON-VEG (Non-veg only)
+        # NON-VEG
         ("Chicken Breast", "Chicken Breast", 290, "kg", 31, 165, 0, 3.6, "100g", False, 29, "non_veg", "/assets/images/foods/non_veg/chicken breast.jpg"),
         ("Chicken Leg", "Chicken Leg", 260, "kg", 26, 184, 0, 8, "100g", False, 26, "non_veg", "/assets/images/foods/non_veg/chicken leg.jpg"),
         ("Eggs", "Anda", 5, "piece", 6, 78, 0.6, 5, "1 egg", False, 5, "non_veg", "/assets/images/foods/non_veg/Whole Egg.jpg"),
