@@ -6,8 +6,8 @@ import os
 import uvicorn
 import logging
 
-# Import your modules
-from database import get_db, engine
+# Import your modules - MAKE SURE THESE FILES EXIST
+from database import get_db, engine, SessionLocal
 import models
 from logic import PlanGenerator
 from schemas import UserCreate
@@ -16,8 +16,12 @@ from schemas import UserCreate
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create tables (MUST be after importing models)
-models.Base.metadata.create_all(bind=engine)
+# Create tables
+try:
+    models.Base.metadata.create_all(bind=engine)
+    logger.info("✅ Database tables created/verified")
+except Exception as e:
+    logger.error(f"❌ Database table creation failed: {e}")
 
 # Initialize FastAPI app
 app = FastAPI(title="Muscle Forge API", version="2.0.0")
@@ -33,8 +37,7 @@ app.add_middleware(
         "https://*.netlify.app",
         "https://mankuudayganesh.github.io",
         "https://*.github.io",
-        "https://muscle-forgee.onrender.com",
-        "*"  # Allow all during development (can restrict later)
+        "*"  # Allow all during debugging
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -47,48 +50,35 @@ def init_database():
     """Seed database on first startup if empty"""
     db = SessionLocal()
     try:
-        from seed import seed_exercises, seed_foods
-        
         # Check if exercises exist
         exercise_count = db.query(models.Exercise).count()
         if exercise_count == 0:
             logger.info("🌱 Database empty - seeding exercises and foods...")
+            from seed import seed_exercises, seed_foods
             seed_exercises()
             seed_foods()
             logger.info("✅ Database seeded successfully!")
         else:
-            logger.info(f"✅ Database already has {exercise_count} exercises and {db.query(models.Food).count()} foods")
+            logger.info(f"✅ Database already has {exercise_count} exercises")
     except Exception as e:
         logger.error(f"⚠️ Seeding error: {e}")
     finally:
         db.close()
 
-# Import SessionLocal for startup event
-from database import SessionLocal
-
 # ========== STATIC FILES MOUNTING ==========
-# Try multiple possible paths for frontend assets
-possible_paths = [
-    os.path.join(os.path.dirname(__file__), "../frontend/assets"),
-    os.path.join(os.path.dirname(__file__), "frontend/assets"),
-    os.path.join(os.path.dirname(__file__), "../assets"),
-    os.path.join(os.path.dirname(__file__), "assets"),
-]
-
 static_mounted = False
-for assets_path in possible_paths:
-    abs_path = os.path.abspath(assets_path)
-    if os.path.exists(abs_path):
-        app.mount("/assets", StaticFiles(directory=abs_path), name="assets")
-        logger.info(f"✅ Static files mounted from: {abs_path}")
+try:
+    assets_path = os.path.join(os.path.dirname(__file__), "assets")
+    if os.path.exists(assets_path):
+        app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
         static_mounted = True
-        break
-
-if not static_mounted:
-    logger.warning("⚠️ Could not find frontend/assets folder! Images may not load.")
+        logger.info(f"✅ Static files mounted from: {assets_path}")
+    else:
+        logger.warning("⚠️ Assets folder not found")
+except Exception as e:
+    logger.warning(f"⚠️ Could not mount static files: {e}")
 
 # ========== ROOT ENDPOINTS ==========
-
 @app.get("/")
 async def root():
     return {
@@ -116,11 +106,10 @@ async def health_check(db: Session = Depends(get_db)):
         return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
 
 # ========== PLAN GENERATION ENDPOINT ==========
-
 @app.post("/api/generate-plan")
 async def generate_plan(user_data: UserCreate, db: Session = Depends(get_db)):
     try:
-        logger.info(f"📊 Received user data: {user_data.dict()}")
+        logger.info(f"📊 Received user data for: {user_data.name}")
         logger.info(f"💰 Budget received: ₹{user_data.budget}")
         
         generator = PlanGenerator()
@@ -182,7 +171,7 @@ async def generate_plan(user_data: UserCreate, db: Session = Depends(get_db)):
             "diet_preference": user_data.diet_preference
         }
         
-        logger.info(f"✅ Plan generated successfully for ₹{user_data.budget} budget")
+        logger.info(f"✅ Plan generated successfully")
         return response_data
     
     except Exception as e:
@@ -192,7 +181,6 @@ async def generate_plan(user_data: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ========== EXERCISES ENDPOINT ==========
-
 @app.get("/api/exercises")
 async def get_exercises(difficulty: str = None, category: str = None, db: Session = Depends(get_db)):
     query = db.query(models.Exercise)
@@ -218,7 +206,6 @@ async def get_exercises(difficulty: str = None, category: str = None, db: Sessio
     ]
 
 # ========== FOODS ENDPOINT ==========
-
 @app.get("/api/foods")
 async def get_foods(category: str = None, is_veg: bool = None, db: Session = Depends(get_db)):
     query = db.query(models.Food)
@@ -247,20 +234,8 @@ async def get_foods(category: str = None, is_veg: bool = None, db: Session = Dep
         for f in foods
     ]
 
-# ========== TEST STATIC FILE ENDPOINT ==========
-@app.get("/test-image/{path:path}")
-async def test_image(path: str):
-    """Debug endpoint to check if image exists"""
-    from fastapi.responses import JSONResponse
-    import os
-    
-    full_path = os.path.join(os.path.dirname(__file__), "../frontend/assets/images", path)
-    if os.path.exists(full_path):
-        return JSONResponse(content={"exists": True, "path": full_path})
-    else:
-        return JSONResponse(content={"exists": False, "path": full_path}, status_code=404)
-
 # ========== RUN SERVER ==========
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
+    logger.info(f"🚀 Starting server on port {port}")
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
