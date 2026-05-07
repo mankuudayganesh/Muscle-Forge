@@ -1,5 +1,5 @@
-// API Configuration
-const API_BASE_URL = 'http://localhost:8000/api';
+// API Configuration - UPDATE THIS LINE with your Render backend
+const API_BASE_URL = 'https://muscle-forge.onrender.com/api';  // Changed from localhost to Render
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -90,9 +90,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         async function checkBackend() {
             try {
-                const response = await fetch('http://localhost:8000/health');
+                // Updated to use Render backend health check
+                const response = await fetch('https://muscle-forge.onrender.com/health');
                 if (response.ok) {
-                    console.log('✅ Backend is reachable');
+                    console.log('✅ Backend is reachable on Render');
                     return true;
                 }
             } catch (error) {
@@ -110,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const isBackendRunning = await checkBackend();
             if (!isBackendRunning) {
-                alert('❌ Cannot connect to backend!\n\nMake sure backend is running:\n1. Open new terminal\n2. Run: python main.py\n3. Keep it running!');
+                alert('❌ Cannot connect to backend!\n\nPlease check:\n1. Backend is deployed on Render\n2. Internet connection is working\n3. Backend URL is correct: https://muscle-forge.onrender.com');
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
                 return;
             }
@@ -185,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.disabled = true;
             
             try {
+                // Using the Render backend URL
                 const response = await fetch(`${API_BASE_URL}/generate-plan`, {
                     method: 'POST',
                     headers: { 
@@ -221,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 console.error('Error:', error);
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
-                alert('❌ Failed to generate plan!\n\nMake sure backend is running on port 8000\n\nRun: python main.py\n\nError: ' + error.message);
+                alert('❌ Failed to generate plan!\n\nBackend URL: https://muscle-forge.onrender.com\n\nError: ' + error.message);
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
